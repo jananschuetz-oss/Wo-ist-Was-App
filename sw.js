@@ -1,9 +1,9 @@
-// Einfacher Cache-first Service Worker für "Abgelegt".
+// Einfacher Cache-first Service Worker für "Wo ist Was App".
 // Wichtig: alle deine Einträge liegen weiterhin in localStorage im Browser —
 // dieser Worker cached nur die App-Hülle (HTML/CSS/JS/Icons), damit die App
 // auch ohne Internetverbindung startet.
 
-const CACHE_NAME = 'abgelegt-cache-v1';
+const CACHE_NAME = 'woistwas-cache-v1';
 const APP_SHELL = [
   './',
   './index.html',

@@ -1,6 +1,6 @@
 {
-  "name": "Abgelegt",
-  "short_name": "Abgelegt",
+  "name": "Wo ist Was App",
+  "short_name": "Wo ist Was",
   "description": "Wo hast du was hingetan? Foto, Name, Ort.",
   "start_url": "./index.html",
   "scope": "./",
