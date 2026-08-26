@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Abgelegt</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/icon-192.png" type="image/png">
+<meta name="theme-color" content="#2E5C4F">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Abgelegt">
+<meta name="format-detection" content="telephone=no">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Inter:wght@400;500;600&display=swap');
+
+:root{
+  --bg:#F6F4EF;
+  --surface:#FFFFFF;
+  --surface-soft:#FBFAF7;
+  --ink:#1E1C19;
+  --ink-soft:#79736A;
+  --ink-faint:#A6A092;
+  --line:#EAE6DC;
+  --primary:#2E5C4F;
+  --primary-dark:#1F433A;
+  --primary-soft:#DEE9E3;
+  --secondary:#5B58A3;
+  --secondary-soft:#E7E6F5;
+  --danger:#B24A3C;
+  --shadow-sm: 0 1px 2px rgba(30,28,25,0.05), 0 1px 1px rgba(30,28,25,0.04);
+  --shadow-md: 0 6px 18px rgba(30,28,25,0.08), 0 2px 6px rgba(30,28,25,0.05);
+  --shadow-lg: 0 20px 48px rgba(30,28,25,0.16), 0 6px 16px rgba(30,28,25,0.08);
+}
+
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:'Inter', sans-serif;
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+}
+
+.app{
+  max-width:640px;
+  margin:0 auto;
+  padding:28px 18px 110px;
+}
+
+/* Header */
+.header{padding:2px 2px 22px;}
+.header h1{
+  font-family:'Manrope', sans-serif;
+  font-weight:800;
+  font-size:30px;
+  letter-spacing:-0.02em;
+  margin:0 0 8px;
+  color:var(--ink);
+}
+.header p.sub{
+  margin:0 0 14px;
+  font-size:14.5px;
+  color:var(--ink-soft);
+  line-height:1.55;
+  max-width:46ch;
+}
+.privacy-chip{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  background:var(--primary-soft);
+  color:var(--primary-dark);
+  font-size:12px;
+  font-weight:600;
+  padding:6px 12px 6px 10px;
+  border-radius:999px;
+}
+.privacy-chip svg{flex-shrink:0;}
+
+.backup-row{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  margin-top:12px;
+  flex-wrap:wrap;
+}
+.backup-link{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  font-size:12.5px;
+  font-weight:600;
+  color:var(--primary-dark);
+  cursor:pointer;
+  background:none;
+  border:none;
+  padding:0;
+  font-family:'Inter', sans-serif;
+}
+.backup-hint{
+  font-size:11.5px;
+  color:var(--ink-faint);
+  width:100%;
+}
+
+.install-hint{
+  display:flex;
+  align-items:flex-start;
+  gap:10px;
+  background:var(--secondary-soft);
+  color:var(--ink);
+  border-radius:14px;
+  padding:12px 12px 12px 14px;
+  margin:16px 0 0;
+  font-size:12.5px;
+  line-height:1.5;
+}
+.install-hint.hidden{display:none;}
+.install-hint-text strong{font-weight:700;}
+.install-hint-text svg{
+  vertical-align:-2px;
+  margin:0 1px;
+}
+.install-hint button#dismissInstallHint{
+  background:none;
+  border:none;
+  color:var(--ink-soft);
+  cursor:pointer;
+  flex-shrink:0;
+  padding:2px;
+}
+.install-hint-cta{
+  background:var(--primary);
+  color:#fff;
+  border:none;
+  border-radius:9px;
+  padding:7px 12px;
+  font-size:12.5px;
+  font-weight:600;
+  cursor:pointer;
+  flex-shrink:0;
+  white-space:nowrap;
+}
+
+/* Search */
+.search-row{
+  position:relative;
+  margin:22px 0 14px;
+}
+.search-row input{
+  width:100%;
+  padding:13px 16px 13px 42px;
+  border-radius:14px;
+  border:1px solid var(--line);
+  background:var(--surface);
+  font-family:'Inter', sans-serif;
+  font-size:15px;
+  color:var(--ink);
+  box-shadow:var(--shadow-sm);
+}
+.search-row input::placeholder{color:var(--ink-faint);}
+.search-row input:focus{
+  outline:none;
+  border-color:var(--primary);
+  box-shadow:0 0 0 3px var(--primary-soft);
+}
+.search-row svg{
+  position:absolute;
+  left:14px;
+  top:50%;
+  transform:translateY(-50%);
+  color:var(--ink-faint);
+}
+
+.count-line{
+  font-size:12px;
+  color:var(--ink-faint);
+  font-weight:500;
+  margin:0 4px 16px;
+}
+
+/* Filter tabs */
+.filter-row{
+  display:flex;
+  gap:8px;
+  margin:0 2px 16px;
+}
+.filter-tab{
+  padding:7px 14px;
+  border-radius:999px;
+  border:1px solid var(--line);
+  background:var(--surface);
+  font-size:12.5px;
+  font-weight:600;
+  color:var(--ink-soft);
+  cursor:pointer;
+}
+.filter-tab.active{
+  background:var(--primary);
+  border-color:var(--primary);
+  color:#fff;
+}
+
+/* Empty state */
+.empty{
+  text-align:center;
+  padding:70px 24px;
+  color:var(--ink-soft);
+}
+.empty .icon-wrap{
+  width:64px; height:64px;
+  border-radius:20px;
+  background:var(--primary-soft);
+  color:var(--primary-dark);
+  display:flex; align-items:center; justify-content:center;
+  margin:0 auto 18px;
+}
+.empty h3{
+  font-family:'Manrope', sans-serif;
+  font-weight:700;
+  font-size:17px;
+  color:var(--ink);
+  margin:0 0 8px;
+}
+.empty p{font-size:14px; margin:0; line-height:1.6;}
+
+/* Grid */
+.grid{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:12px;
+}
+@media(min-width:560px){
+  .grid{grid-template-columns:1fr 1fr;}
+}
+
+.item-card{
+  position:relative;
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:14px;
+  box-shadow:var(--shadow-sm);
+  display:flex;
+  gap:13px;
+  cursor:pointer;
+  transition:transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+}
+.item-card:active{transform:scale(0.97); box-shadow:var(--shadow-sm);}
+.item-card.done{opacity:0.55;}
+.item-card.done .label{text-decoration:line-through; text-decoration-color:var(--ink-faint);}
+.check-btn{
+  position:absolute;
+  top:10px;
+  right:10px;
+  width:26px;
+  height:26px;
+  border-radius:50%;
+  border:1.5px solid var(--line);
+  background:var(--surface);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:transparent;
+  cursor:pointer;
+  z-index:2;
+  flex-shrink:0;
+}
+.check-btn.checked{
+  background:var(--primary);
+  border-color:var(--primary);
+  color:#fff;
+}
+.item-card .thumb{
+  width:64px;
+  height:64px;
+  border-radius:13px;
+  object-fit:cover;
+  flex-shrink:0;
+  background:var(--surface-soft);
+}
+.item-card .thumb.placeholder{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:var(--ink-faint);
+  border:1px solid var(--line);
+}
+.item-card .body{
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  gap:4px;
+}
+.item-card .label{
+  font-family:'Manrope', sans-serif;
+  font-weight:700;
+  font-size:15px;
+  color:var(--ink);
+  margin:0;
+  word-break:break-word;
+  line-height:1.3;
+}
+.item-card .location{
+  display:flex;
+  align-items:flex-start;
+  gap:5px;
+  font-size:13px;
+  color:var(--ink-soft);
+  line-height:1.4;
+  margin:0;
+  word-break:break-word;
+}
+.item-card .location svg{flex-shrink:0; margin-top:1.5px; color:var(--ink-faint);}
+.item-card .meta{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  flex-wrap:wrap;
+  margin-top:2px;
+}
+.item-card .category{
+  font-size:10.5px;
+  font-weight:600;
+  color:var(--secondary);
+  background:var(--secondary-soft);
+  padding:3px 9px;
+  border-radius:999px;
+}
+.item-card .date{
+  font-size:11px;
+  color:var(--ink-faint);
+}
+
+/* Floating add button */
+.fab{
+  position:fixed;
+  right:20px;
+  bottom:26px;
+  width:58px;
+  height:58px;
+  border-radius:50%;
+  background:linear-gradient(155deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color:#fff;
+  border:none;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  box-shadow:var(--shadow-lg);
+  cursor:pointer;
+  z-index:20;
+  transition:transform 0.15s ease;
+}
+.fab:active{transform:scale(0.92);}
+
+/* Modal */
+.overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(20,18,15,0.42);
+  backdrop-filter:blur(2px);
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  z-index:50;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity 0.22s ease;
+}
+.overlay.open{opacity:1; pointer-events:auto;}
+.sheet{
+  background:var(--bg);
+  width:100%;
+  max-width:640px;
+  border-radius:26px 26px 0 0;
+  padding:10px 20px calc(24px + env(safe-area-inset-bottom));
+  max-height:90vh;
+  overflow-y:auto;
+  transform:translateY(24px);
+  transition:transform 0.24s cubic-bezier(.32,.72,.35,1);
+  box-shadow:var(--shadow-lg);
+}
+.overlay.open .sheet{transform:translateY(0);}
+.sheet-handle{
+  width:36px; height:4px;
+  background:var(--line);
+  border-radius:99px;
+  margin:10px auto 16px;
+}
+.sheet h2{
+  font-family:'Manrope', sans-serif;
+  font-weight:800;
+  font-size:20px;
+  margin:0 0 18px;
+}
+.field{margin-bottom:15px;}
+.field label{
+  display:block;
+  font-size:12px;
+  font-weight:600;
+  color:var(--ink-soft);
+  margin-bottom:7px;
+}
+.field input[type=text], .field textarea{
+  width:100%;
+  padding:12px 14px;
+  border-radius:12px;
+  border:1px solid var(--line);
+  background:var(--surface);
+  font-family:'Inter', sans-serif;
+  font-size:15px;
+  color:var(--ink);
+}
+.field input[type=text]::placeholder, .field textarea::placeholder{color:var(--ink-faint);}
+.field input[type=text]:focus, .field textarea:focus{
+  outline:none;
+  border-color:var(--primary);
+  box-shadow:0 0 0 3px var(--primary-soft);
+}
+
+/* Photo picker */
+.photo-zone{
+  display:flex;
+  gap:12px;
+  align-items:center;
+}
+.photo-preview-wrap{
+  position:relative;
+  width:72px;
+  height:72px;
+  border-radius:16px;
+  overflow:hidden;
+  flex-shrink:0;
+  background:var(--surface);
+  border:1px solid var(--line);
+}
+.photo-preview-wrap img{
+  width:100%; height:100%; object-fit:cover; display:block;
+}
+.photo-preview-wrap.empty{
+  display:flex; align-items:center; justify-content:center;
+  color:var(--ink-faint);
+}
+.photo-actions{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  flex:1;
+}
+.photo-btn{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  padding:10px 12px;
+  border-radius:11px;
+  border:1px solid var(--line);
+  background:var(--surface);
+  font-family:'Inter', sans-serif;
+  font-weight:500;
+  font-size:13.5px;
+  color:var(--ink);
+  cursor:pointer;
+}
+.photo-btn:active{background:var(--surface-soft);}
+input[type=file]{
+  position:absolute;
+  width:1px;
+  height:1px;
+  padding:0;
+  margin:-1px;
+  overflow:hidden;
+  clip:rect(0,0,0,0);
+  white-space:nowrap;
+  border:0;
+}
+
+.btn-row{
+  display:flex;
+  gap:10px;
+  margin-top:22px;
+}
+.btn{
+  flex:1;
+  padding:14px;
+  border-radius:13px;
+  border:none;
+  font-family:'Inter', sans-serif;
+  font-size:14.5px;
+  font-weight:600;
+  cursor:pointer;
+}
+.btn-primary{background:var(--primary); color:#fff;}
+.btn-primary:active{background:var(--primary-dark);}
+.btn-primary:disabled{background:var(--line); color:var(--ink-faint); cursor:not-allowed;}
+.btn-secondary{background:var(--surface); color:var(--ink-soft); border:1px solid var(--line);}
+.btn-danger{background:transparent; color:var(--danger); border:1px solid rgba(178,74,60,0.35);}
+
+.toast{
+  position:fixed;
+  bottom:100px;
+  left:50%;
+  transform:translateX(-50%);
+  background:var(--ink);
+  color:#fff;
+  padding:11px 18px;
+  border-radius:12px;
+  font-size:13px;
+  font-weight:500;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity 0.2s ease;
+  z-index:60;
+  max-width:88%;
+  text-align:center;
+  box-shadow:var(--shadow-md);
+}
+.toast.show{opacity:1;}
+
+.loading-row{
+  text-align:center;
+  padding:50px 0;
+  color:var(--ink-faint);
+  font-size:13px;
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="header">
+    <h1>Abgelegt.</h1>
+    <p class="sub">Foto machen, benennen, Ort notieren — und beim nächsten Mal einfach nachschauen statt suchen.</p>
+    <span class="privacy-chip">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2 4 5v6c0 5.5 3.4 9.7 8 11 4.6-1.3 8-5.5 8-11V5l-8-3z"/></svg>
+      <span id="storageModeLabel">Privat — nur lokal auf diesem Gerät gespeichert</span>
+    </span>
+
+    <div class="backup-row">
+      <button class="backup-link" id="backupBtn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+        Sichern
+      </button>
+      <label class="backup-link" for="restoreInput">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg>
+        Wiederherstellen
+      </label>
+      <input type="file" id="restoreInput" accept="application/json,.json">
+      <span class="backup-hint" id="backupHint"></span>
+    </div>
+  </div>
+
+  <div class="install-hint" id="installHint">
+    <div class="install-hint-text" id="installHintText">
+      <strong>Als App nutzen:</strong> Teilen-Symbol <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v13M8 7l4-4 4 4"/><rect x="4" y="12" width="16" height="8" rx="2"/></svg> antippen → „Zum Home-Bildschirm“. Öffnet dann ohne Browserleiste, mit eigenem Icon.
+    </div>
+    <button class="install-hint-cta" id="androidInstallBtn" style="display:none;">App installieren</button>
+    <button id="dismissInstallHint" aria-label="Hinweis schließen">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+  </div>
+
+  <div class="search-row">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+    <input type="text" id="searchInput" placeholder="Suchen — z. B. Ausweis, Schlafzimmer, Geschenke …">
+  </div>
+
+  <div class="filter-row">
+    <button class="filter-tab active" data-filter="open">Offen</button>
+    <button class="filter-tab" data-filter="done">Erledigt</button>
+    <button class="filter-tab" data-filter="all">Alle</button>
+  </div>
+
+  <p class="count-line" id="countLine"></p>
+
+  <div id="content">
+    <div class="loading-row">lädt …</div>
+  </div>
+</div>
+
+<button class="fab" id="addBtn" aria-label="Neuen Eintrag hinzufügen">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+</button>
+
+<div class="overlay" id="overlay">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <h2 id="sheetTitle">Neuer Eintrag</h2>
+
+    <div class="field">
+      <label>Foto (optional)</label>
+      <div class="photo-zone">
+        <div class="photo-preview-wrap empty" id="photoPreviewWrap">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="7" width="18" height="13" rx="3"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><circle cx="12" cy="13.5" r="3"/></svg>
+        </div>
+        <div class="photo-actions">
+          <label class="photo-btn" for="photoInputCamera">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="7" width="18" height="13" rx="3"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><circle cx="12" cy="13.5" r="3"/></svg>
+            Kamera
+          </label>
+          <label class="photo-btn" for="photoInputGallery">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="m3 16 5-5 4 4 5-6 4 5"/></svg>
+            Galerie
+          </label>
+        </div>
+        <input type="file" id="photoInputCamera" accept="image/*" capture="environment">
+        <input type="file" id="photoInputGallery" accept="image/*">
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Was ist es?</label>
+      <input type="text" id="labelInput" placeholder="z. B. Ausweis, Geburtstagsgeschenk für Mia">
+    </div>
+
+    <div class="field">
+      <label>Wo hast du es hingetan?</label>
+      <textarea id="locationInput" rows="2" placeholder="z. B. Schlafzimmer, linker Schrank, obere Ecke"></textarea>
+    </div>
+
+    <div class="field">
+      <label>Kategorie (optional)</label>
+      <input type="text" id="categoryInput" list="categoryList" placeholder="z. B. Geschenke, Dokumente, Schlüssel">
+      <datalist id="categoryList">
+        <option value="Geschenke">
+        <option value="Dokumente">
+        <option value="Schlüssel">
+        <option value="Erinnerungsstücke">
+        <option value="Sonstiges">
+      </datalist>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-secondary" id="cancelBtn">Abbrechen</button>
+      <button class="btn btn-primary" id="saveBtn">Speichern</button>
+    </div>
+    <div class="btn-row" id="deleteRow" style="display:none;">
+      <button class="btn btn-danger" id="deleteBtn">Eintrag löschen</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const STORAGE_KEY = 'stash-items';
+let items = [];
+let editingId = null;
+let pendingPhoto = null;
+
+// Speichert grundsätzlich lokal auf diesem Gerät/Browser (localStorage) —
+// kein Cloud-Abgleich, keine Abhängigkeit von der Claude-Umgebung.
+async function storageGet(key){
+  const raw = localStorage.getItem(key);
+  return raw !== null ? {value: raw} : null;
+}
+
+async function storageSet(key, value){
+  localStorage.setItem(key, value);
+  return {value};
+}
+
+const el = id => document.getElementById(id);
+const contentEl = el('content');
+const searchInput = el('searchInput');
+const overlay = el('overlay');
+const toast = el('toast');
+const countLine = el('countLine');
+let activeFilter = 'open';
+
+function showToast(msg){
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(()=>toast.classList.remove('show'), 2400);
+}
+
+function escapeHtml(s){
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+function formatDate(iso){
+  try{
+    const d = new Date(iso);
+    return d.toLocaleDateString('de-DE', {day:'2-digit', month:'2-digit', year:'numeric'});
+  }catch(e){ return ''; }
+}
+
+async function loadItems(){
+  try{
+    const result = await storageGet(STORAGE_KEY);
+    items = result && result.value ? JSON.parse(result.value) : [];
+  }catch(e){
+    items = [];
+  }
+  render();
+}
+
+async function saveItems(){
+  try{
+    const ok = await storageSet(STORAGE_KEY, JSON.stringify(items));
+    if(!ok) throw new Error('no result');
+  }catch(e){
+    showToast('Speichern fehlgeschlagen — bitte nochmal versuchen.');
+    throw e;
+  }
+}
+
+function render(){
+  const q = searchInput.value.trim().toLowerCase();
+
+  let base = items;
+  if(activeFilter === 'open') base = items.filter(it => !it.done);
+  else if(activeFilter === 'done') base = items.filter(it => it.done);
+
+  const filtered = q
+    ? base.filter(it =>
+        (it.label||'').toLowerCase().includes(q) ||
+        (it.location||'').toLowerCase().includes(q) ||
+        (it.category||'').toLowerCase().includes(q))
+    : base;
+
+  const sorted = [...filtered].sort((a,b)=> (b.createdAt||'').localeCompare(a.createdAt||''));
+
+  const openCount = items.filter(it=>!it.done).length;
+  countLine.textContent = items.length === 0
+    ? ''
+    : `${openCount} offen · ${items.length - openCount} erledigt`;
+
+  if(items.length === 0){
+    contentEl.innerHTML = `
+      <div class="empty">
+        <div class="icon-wrap">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="7" width="18" height="13" rx="3"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+        </div>
+        <h3>Noch nichts abgelegt</h3>
+        <p>Tippe unten rechts auf „+“, um deinen ersten Ort festzuhalten.</p>
+      </div>`;
+    return;
+  }
+
+  if(sorted.length === 0){
+    const msg = activeFilter === 'done' ? 'Noch nichts als erledigt markiert.' : 'Keine Treffer.';
+    contentEl.innerHTML = `<div class="empty"><h3>${msg}</h3></div>`;
+    return;
+  }
+
+  contentEl.innerHTML = `<div class="grid">${sorted.map(cardHtml).join('')}</div>`;
+
+  sorted.forEach(it=>{
+    const cardNode = document.getElementById('card-'+it.id);
+    if(cardNode) cardNode.addEventListener('click', ()=>openEdit(it.id));
+    const checkNode = document.getElementById('check-'+it.id);
+    if(checkNode) checkNode.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      toggleDone(it.id);
+    });
+  });
+}
+
+function cardHtml(it){
+  const thumb = it.photo
+    ? `<img class="thumb" src="${it.photo}" alt="">`
+    : `<div class="thumb placeholder"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="7" width="18" height="13" rx="3"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></div>`;
+
+  return `
+    <div class="item-card ${it.done ? 'done' : ''}" id="card-${it.id}">
+      <button class="check-btn ${it.done ? 'checked' : ''}" id="check-${it.id}" aria-label="Als erledigt markieren">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+      </button>
+      ${thumb}
+      <div class="body">
+        <p class="label">${escapeHtml(it.label)}</p>
+        <p class="location">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s7-6.3 7-11a7 7 0 1 0-14 0c0 4.7 7 11 7 11z"/><circle cx="12" cy="10" r="2.4"/></svg>
+          <span>${escapeHtml(it.location)}</span>
+        </p>
+        <div class="meta">
+          ${it.category ? `<span class="category">${escapeHtml(it.category)}</span>` : ''}
+          <span class="date">${formatDate(it.createdAt)}</span>
+        </div>
+      </div>
+    </div>`;
+}
+
+async function toggleDone(id){
+  const idx = items.findIndex(i=>i.id===id);
+  if(idx===-1) return;
+  items[idx].done = !items[idx].done;
+  try{
+    await saveItems();
+    render();
+    showToast(items[idx].done ? 'Als erledigt markiert.' : 'Wieder als offen markiert.');
+  }catch(e){}
+}
+
+// --- Photo handling ---
+function resizeAndEncode(file){
+  return new Promise((resolve, reject)=>{
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        const maxDim = 800;
+        let w = img.width, h = img.height;
+        if(w > h && w > maxDim){ h = h*(maxDim/w); w = maxDim; }
+        else if(h > maxDim){ w = w*(maxDim/h); h = maxDim; }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL('image/jpeg', 0.72));
+      };
+      img.onerror = reject;
+      img.src = e.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+function setPhotoPreview(dataUrl){
+  const wrap = el('photoPreviewWrap');
+  if(dataUrl){
+    wrap.classList.remove('empty');
+    wrap.innerHTML = `<img src="${dataUrl}" alt="">`;
+  }else{
+    wrap.classList.add('empty');
+    wrap.innerHTML = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="7" width="18" height="13" rx="3"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><circle cx="12" cy="13.5" r="3"/></svg>`;
+  }
+}
+
+async function handleFileSelect(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  try{
+    pendingPhoto = await resizeAndEncode(file);
+    setPhotoPreview(pendingPhoto);
+  }catch(err){
+    showToast('Foto konnte nicht geladen werden.');
+  }
+  e.target.value = '';
+}
+
+el('photoInputCamera').addEventListener('change', handleFileSelect);
+el('photoInputGallery').addEventListener('change', handleFileSelect);
+
+// --- Modal open/close ---
+function openNew(){
+  editingId = null;
+  pendingPhoto = null;
+  el('sheetTitle').textContent = 'Neuer Eintrag';
+  el('labelInput').value = '';
+  el('locationInput').value = '';
+  el('categoryInput').value = '';
+  setPhotoPreview(null);
+  el('deleteRow').style.display = 'none';
+  overlay.classList.add('open');
+  setTimeout(()=>el('labelInput').focus(), 220);
+}
+
+function openEdit(id){
+  const it = items.find(i=>i.id===id);
+  if(!it) return;
+  editingId = id;
+  pendingPhoto = it.photo || null;
+  el('sheetTitle').textContent = 'Eintrag bearbeiten';
+  el('labelInput').value = it.label;
+  el('locationInput').value = it.location;
+  el('categoryInput').value = it.category || '';
+  setPhotoPreview(it.photo || null);
+  el('deleteRow').style.display = 'flex';
+  overlay.classList.add('open');
+}
+
+function closeSheet(){
+  overlay.classList.remove('open');
+}
+
+el('addBtn').addEventListener('click', openNew);
+el('cancelBtn').addEventListener('click', closeSheet);
+overlay.addEventListener('click', (e)=>{ if(e.target === overlay) closeSheet(); });
+
+el('saveBtn').addEventListener('click', async ()=>{
+  const label = el('labelInput').value.trim();
+  const location = el('locationInput').value.trim();
+  const category = el('categoryInput').value.trim();
+
+  if(!label || !location){
+    showToast('Bitte gib an, was es ist und wo es liegt.');
+    return;
+  }
+
+  el('saveBtn').disabled = true;
+  el('saveBtn').textContent = 'Speichert …';
+
+  if(editingId){
+    const idx = items.findIndex(i=>i.id===editingId);
+    if(idx>-1){
+      items[idx] = {...items[idx], label, location, category, photo: pendingPhoto};
+    }
+  }else{
+    items.push({
+      id: 'it_' + Date.now() + '_' + Math.random().toString(36).slice(2,7),
+      label, location, category,
+      photo: pendingPhoto,
+      done: false,
+      createdAt: new Date().toISOString()
+    });
+  }
+
+  try{
+    await saveItems();
+    closeSheet();
+    render();
+    showToast('Gespeichert.');
+  }catch(e){
+    // toast already shown by saveItems
+  }finally{
+    el('saveBtn').disabled = false;
+    el('saveBtn').textContent = 'Speichern';
+  }
+});
+
+el('deleteBtn').addEventListener('click', async ()=>{
+  if(!editingId) return;
+  items = items.filter(i=>i.id!==editingId);
+  try{
+    await saveItems();
+    closeSheet();
+    render();
+    showToast('Eintrag gelöscht.');
+  }catch(e){}
+});
+
+searchInput.addEventListener('input', render);
+
+document.querySelectorAll('.filter-tab').forEach(tab=>{
+  tab.addEventListener('click', ()=>{
+    document.querySelectorAll('.filter-tab').forEach(t=>t.classList.remove('active'));
+    tab.classList.add('active');
+    activeFilter = tab.dataset.filter;
+    render();
+  });
+});
+
+// --- Sichern / Wiederherstellen (überlebt "Browserdaten löschen") ---
+function updateBackupHint(){
+  const raw = localStorage.getItem('stash-last-backup');
+  const hint = el('backupHint');
+  if(!hint) return;
+  hint.textContent = raw
+    ? 'Letzte Sicherung: ' + new Date(raw).toLocaleString('de-DE', {day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit'})
+    : 'Noch keine Sicherung erstellt.';
+}
+
+el('backupBtn').addEventListener('click', ()=>{
+  if(items.length === 0){
+    showToast('Es gibt noch nichts zu sichern.');
+    return;
+  }
+  const blob = new Blob([JSON.stringify(items, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const stamp = new Date().toISOString().slice(0,10);
+  a.href = url;
+  a.download = `abgelegt-backup-${stamp}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+  localStorage.setItem('stash-last-backup', new Date().toISOString());
+  updateBackupHint();
+  showToast('Sicherungsdatei heruntergeladen.');
+});
+
+el('restoreInput').addEventListener('change', (e)=>{
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = async (ev)=>{
+    try{
+      const parsed = JSON.parse(ev.target.result);
+      if(!Array.isArray(parsed)) throw new Error('kein gültiges Sicherungsformat');
+
+      const existingIds = new Set(items.map(i=>i.id));
+      let added = 0, updated = 0;
+      parsed.forEach(incoming=>{
+        if(!incoming || !incoming.id) return;
+        const idx = items.findIndex(i=>i.id===incoming.id);
+        if(idx>-1){ items[idx] = incoming; updated++; }
+        else { items.push(incoming); added++; }
+      });
+
+      await saveItems();
+      render();
+      showToast(`Wiederhergestellt: ${added} neu, ${updated} aktualisiert.`);
+    }catch(err){
+      showToast('Diese Datei sieht nicht wie eine gültige Sicherung aus.');
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+});
+
+updateBackupHint();
+
+// Installations-Hinweis nur zeigen, wenn nicht bereits im Vollbild-/Standalone-Modus
+// und nicht schon zuvor weggeklickt.
+// Installations-Hinweis nur zeigen, wenn nicht bereits im Vollbild-/Standalone-Modus
+// und nicht schon zuvor weggeklickt.
+(function initInstallHint(){
+  const hint = el('installHint');
+  const hintText = el('installHintText');
+  const androidBtn = el('androidInstallBtn');
+  const isStandalone = window.navigator.standalone === true
+    || window.matchMedia('(display-mode: standalone)').matches;
+  const dismissed = localStorage.getItem('stash-install-hint-dismissed') === '1';
+
+  if(isStandalone || dismissed){
+    hint.classList.add('hidden');
+    return;
+  }
+
+  // Android/Chrome: eigenes Installations-Angebot statt manueller Anleitung
+  let deferredPrompt = null;
+  window.addEventListener('beforeinstallprompt', (e)=>{
+    e.preventDefault();
+    deferredPrompt = e;
+    hintText.innerHTML = '<strong>Als App installieren</strong> — kein Umweg über den Browser mehr nötig.';
+    androidBtn.style.display = 'inline-block';
+  });
+
+  androidBtn.addEventListener('click', async ()=>{
+    if(!deferredPrompt) return;
+    deferredPrompt.prompt();
+    await deferredPrompt.userChoice;
+    deferredPrompt = null;
+    hint.classList.add('hidden');
+    localStorage.setItem('stash-install-hint-dismissed', '1');
+  });
+
+  el('dismissInstallHint').addEventListener('click', ()=>{
+    hint.classList.add('hidden');
+    localStorage.setItem('stash-install-hint-dismissed', '1');
+  });
+})();
+
+// Service Worker nur registrieren, wenn über echten Server (http/https) geladen —
+// über eine lokale file:// -Datei wird das vom Browser ohnehin verweigert.
+if('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('sw.js').catch(()=>{ /* stiller Fehlschlag, App funktioniert trotzdem */ });
+  });
+}
+
+loadItems();
+</script>
+
+</body>
+</html>
