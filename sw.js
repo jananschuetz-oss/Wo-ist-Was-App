@@ -3,7 +3,7 @@
 // dieser Worker cached nur die App-Hülle (HTML/CSS/JS/Icons), damit die App
 // auch ohne Internetverbindung startet.
 
-const CACHE_NAME = 'woistwas-cache-v1';
+const CACHE_NAME = 'woistwas-cache-v2';
 const APP_SHELL = [
   './',
   './index.html',
