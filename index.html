@@ -2,11 +2,12 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Wo ist Was App</title>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icons/icon-192.png" type="image/png">
-<meta name="theme-color" content="#2E5C4F">
+<meta name="theme-color" content="#2E5C4F" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#171614" media="(prefers-color-scheme: dark)">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -21,18 +22,41 @@
   --surface:#FFFFFF;
   --surface-soft:#FBFAF7;
   --ink:#1E1C19;
-  --ink-soft:#79736A;
-  --ink-faint:#A6A092;
+  --ink-soft:#5F5A50;
+  --ink-faint:#7A7466;
   --line:#EAE6DC;
   --primary:#2E5C4F;
   --primary-dark:#1F433A;
   --primary-soft:#DEE9E3;
-  --secondary:#5B58A3;
+  --secondary:#54519A;
   --secondary-soft:#E7E6F5;
-  --danger:#B24A3C;
+  --danger:#A8412F;
+  --on-primary:#FFFFFF;
   --shadow-sm: 0 1px 2px rgba(30,28,25,0.05), 0 1px 1px rgba(30,28,25,0.04);
   --shadow-md: 0 6px 18px rgba(30,28,25,0.08), 0 2px 6px rgba(30,28,25,0.05);
   --shadow-lg: 0 20px 48px rgba(30,28,25,0.16), 0 6px 16px rgba(30,28,25,0.08);
+}
+
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#171614;
+    --surface:#221F1C;
+    --surface-soft:#1C1A17;
+    --ink:#F3F0EA;
+    --ink-soft:#B8B1A4;
+    --ink-faint:#938C7E;
+    --line:#332F2A;
+    --primary:#6DBBA3;
+    --primary-dark:#579C86;
+    --primary-soft:#243330;
+    --secondary:#A9A5E6;
+    --secondary-soft:#2A2940;
+    --danger:#E38273;
+    --on-primary:#12211C;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.45);
+    --shadow-md: 0 6px 18px rgba(0,0,0,0.5);
+    --shadow-lg: 0 20px 48px rgba(0,0,0,0.62);
+  }
 }
 
 *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
@@ -44,11 +68,12 @@ body{
   min-height:100vh;
   -webkit-font-smoothing:antialiased;
 }
+body.no-scroll{overflow:hidden;}
 
 .app{
   max-width:640px;
   margin:0 auto;
-  padding:28px 18px 110px;
+  padding:calc(28px + env(safe-area-inset-top)) 18px 120px;
 }
 
 /* Header */
@@ -105,6 +130,11 @@ body{
   font-size:11.5px;
   color:var(--ink-faint);
   width:100%;
+  line-height:1.5;
+}
+.backup-hint .reminder{
+  color:var(--danger);
+  font-weight:600;
 }
 
 .install-hint{
@@ -135,7 +165,7 @@ body{
 }
 .install-hint-cta{
   background:var(--primary);
-  color:#fff;
+  color:var(--on-primary);
   border:none;
   border-radius:9px;
   padding:7px 12px;
@@ -153,7 +183,7 @@ body{
 }
 .search-row input{
   width:100%;
-  padding:13px 16px 13px 42px;
+  padding:13px 40px 13px 42px;
   border-radius:14px;
   border:1px solid var(--line);
   background:var(--surface);
@@ -168,26 +198,37 @@ body{
   border-color:var(--primary);
   box-shadow:0 0 0 3px var(--primary-soft);
 }
-.search-row svg{
+.search-row > svg{
   position:absolute;
   left:14px;
   top:50%;
   transform:translateY(-50%);
   color:var(--ink-faint);
+  pointer-events:none;
 }
-
-.count-line{
-  font-size:12px;
-  color:var(--ink-faint);
-  font-weight:500;
-  margin:0 4px 16px;
+.search-clear{
+  position:absolute;
+  right:8px;
+  top:50%;
+  transform:translateY(-50%);
+  width:28px;
+  height:28px;
+  border-radius:50%;
+  border:none;
+  background:var(--line);
+  color:var(--ink-soft);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
 }
+.search-clear[hidden]{display:none;}
 
 /* Filter tabs */
 .filter-row{
   display:flex;
   gap:8px;
-  margin:0 2px 16px;
+  margin:0 2px 14px;
 }
 .filter-tab{
   padding:7px 14px;
@@ -202,7 +243,64 @@ body{
 .filter-tab.active{
   background:var(--primary);
   border-color:var(--primary);
+  color:var(--on-primary);
+}
+
+/* Kategorie-Chips */
+.chip-row{
+  display:flex;
+  gap:8px;
+  margin:0 2px 14px;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+  padding-bottom:2px;
+  scrollbar-width:none;
+}
+.chip-row[hidden]{display:none;}
+.chip-row::-webkit-scrollbar{display:none;}
+.chip{
+  white-space:nowrap;
+  padding:6px 12px;
+  border-radius:999px;
+  border:1px solid var(--line);
+  background:var(--surface);
+  font-size:12px;
+  font-weight:600;
+  color:var(--ink-soft);
+  cursor:pointer;
+  flex-shrink:0;
+}
+.chip.active{
+  background:var(--secondary);
+  border-color:var(--secondary);
   color:#fff;
+}
+
+/* Toolbar: Zähler + Sortierung */
+.toolbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin:0 4px 16px;
+}
+.toolbar[hidden]{display:none;}
+.count-line{
+  font-size:12px;
+  color:var(--ink-faint);
+  font-weight:500;
+  margin:0;
+}
+.toolbar select{
+  font-family:'Inter', sans-serif;
+  font-size:12px;
+  font-weight:600;
+  color:var(--ink-soft);
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:9px;
+  padding:6px 8px;
+  cursor:pointer;
 }
 
 /* Empty state */
@@ -273,7 +371,13 @@ body{
 .check-btn.checked{
   background:var(--primary);
   border-color:var(--primary);
-  color:#fff;
+  color:var(--on-primary);
+}
+.thumb-wrap{
+  position:relative;
+  width:64px;
+  height:64px;
+  flex-shrink:0;
 }
 .item-card .thumb{
   width:64px;
@@ -282,6 +386,7 @@ body{
   object-fit:cover;
   flex-shrink:0;
   background:var(--surface-soft);
+  display:block;
 }
 .item-card .thumb.placeholder{
   display:flex;
@@ -290,7 +395,19 @@ body{
   color:var(--ink-faint);
   border:1px solid var(--line);
 }
-.item-card .thumb:not(.placeholder){cursor:zoom-in;}
+.thumb-wrap .thumb{cursor:zoom-in;}
+.thumb-badge{
+  position:absolute;
+  right:-4px;
+  bottom:-4px;
+  background:var(--ink);
+  color:var(--bg);
+  font-size:10px;
+  font-weight:700;
+  padding:2px 6px;
+  border-radius:999px;
+  border:2px solid var(--surface);
+}
 .item-card .body{
   min-width:0;
   display:flex;
@@ -342,12 +459,12 @@ body{
 .fab{
   position:fixed;
   right:20px;
-  bottom:26px;
+  bottom:calc(26px + env(safe-area-inset-bottom));
   width:58px;
   height:58px;
   border-radius:50%;
   background:linear-gradient(155deg, var(--primary) 0%, var(--primary-dark) 100%);
-  color:#fff;
+  color:var(--on-primary);
   border:none;
   display:flex;
   align-items:center;
@@ -424,41 +541,57 @@ body{
   box-shadow:0 0 0 3px var(--primary-soft);
 }
 
-/* Photo picker */
-.photo-zone{
+/* Foto-Streifen */
+.photo-strip{
   display:flex;
-  gap:12px;
-  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-bottom:10px;
 }
-.photo-preview-wrap{
+.photo-strip[hidden]{display:none;}
+.pstrip-item{
   position:relative;
   width:72px;
   height:72px;
-  border-radius:16px;
-  overflow:hidden;
+  border-radius:14px;
+  overflow:visible;
   flex-shrink:0;
-  background:var(--surface);
+}
+.pstrip-item img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  border-radius:14px;
   border:1px solid var(--line);
+  cursor:zoom-in;
+  display:block;
 }
-.photo-preview-wrap img{
-  width:100%; height:100%; object-fit:cover; display:block; cursor:zoom-in;
-}
-.photo-preview-wrap.empty{
-  display:flex; align-items:center; justify-content:center;
-  color:var(--ink-faint);
-}
-.photo-actions{
+.pstrip-remove{
+  position:absolute;
+  top:-7px;
+  right:-7px;
+  width:22px;
+  height:22px;
+  border-radius:50%;
+  border:2px solid var(--bg);
+  background:var(--danger);
+  color:#fff;
   display:flex;
-  flex-direction:column;
-  gap:8px;
-  flex:1;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  padding:0;
+}
+.photo-add-row{
+  display:flex;
+  gap:10px;
 }
 .photo-btn{
   display:flex;
   align-items:center;
   justify-content:center;
   gap:7px;
-  padding:10px 12px;
+  padding:10px 14px;
   border-radius:11px;
   border:1px solid var(--line);
   background:var(--surface);
@@ -496,11 +629,13 @@ input[type=file]{
   font-weight:600;
   cursor:pointer;
 }
-.btn-primary{background:var(--primary); color:#fff;}
+.btn-primary{background:var(--primary); color:var(--on-primary);}
 .btn-primary:active{background:var(--primary-dark);}
 .btn-primary:disabled{background:var(--line); color:var(--ink-faint); cursor:not-allowed;}
 .btn-secondary{background:var(--surface); color:var(--ink-soft); border:1px solid var(--line);}
-.btn-danger{background:transparent; color:var(--danger); border:1px solid rgba(178,74,60,0.35);}
+.btn-ghost{background:transparent; color:var(--ink-soft); border:1px solid var(--line);}
+.btn-danger{background:transparent; color:var(--danger); border:1px solid color-mix(in srgb, var(--danger) 35%, transparent);}
+.btn-danger.armed{background:var(--danger); color:#fff; border-color:var(--danger);}
 
 .toast{
   position:fixed;
@@ -508,7 +643,7 @@ input[type=file]{
   left:50%;
   transform:translateX(-50%);
   background:var(--ink);
-  color:#fff;
+  color:var(--bg);
   padding:11px 18px;
   border-radius:12px;
   font-size:13px;
@@ -516,7 +651,7 @@ input[type=file]{
   opacity:0;
   pointer-events:none;
   transition:opacity 0.2s ease;
-  z-index:60;
+  z-index:90;
   max-width:88%;
   text-align:center;
   box-shadow:var(--shadow-md);
@@ -530,19 +665,47 @@ input[type=file]{
   font-size:13px;
 }
 
+/* Update-Hinweis */
+.update-bar{
+  position:fixed;
+  left:0; right:0; bottom:0;
+  background:var(--ink);
+  color:var(--bg);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:14px;
+  padding:12px 16px calc(12px + env(safe-area-inset-bottom));
+  font-size:13px;
+  z-index:75;
+}
+.update-bar[hidden]{display:none;}
+.update-bar button{
+  background:var(--bg);
+  color:var(--ink);
+  border:none;
+  border-radius:8px;
+  padding:7px 14px;
+  font-weight:600;
+  font-size:13px;
+  cursor:pointer;
+  font-family:'Inter', sans-serif;
+}
+
 /* Foto-Vollbild (Lightbox) */
 .lightbox{
   position:fixed;
   inset:0;
-  background:rgba(10,9,8,0.94);
+  background:rgba(10,9,8,0.95);
   display:flex;
   align-items:center;
   justify-content:center;
   padding:24px;
-  z-index:80;
+  z-index:100;
   opacity:0;
   pointer-events:none;
   transition:opacity 0.2s ease;
+  overflow:hidden;
 }
 .lightbox.open{opacity:1; pointer-events:auto;}
 .lightbox img{
@@ -551,7 +714,11 @@ input[type=file]{
   object-fit:contain;
   border-radius:12px;
   box-shadow:var(--shadow-lg);
+  transition:transform 0.2s ease;
+  touch-action:none;
+  will-change:transform;
 }
+.lightbox img.zoomed{cursor:grab; transition:none;}
 .lightbox-close{
   position:absolute;
   top:calc(14px + env(safe-area-inset-top));
@@ -560,7 +727,7 @@ input[type=file]{
   height:40px;
   border-radius:50%;
   border:none;
-  background:rgba(255,255,255,0.15);
+  background:rgba(255,255,255,0.16);
   color:#fff;
   display:flex;
   align-items:center;
@@ -568,7 +735,39 @@ input[type=file]{
   cursor:pointer;
   z-index:2;
 }
-.lightbox-close:active{background:rgba(255,255,255,0.28);}
+.lightbox-close:active{background:rgba(255,255,255,0.3);}
+.lb-nav{
+  position:absolute;
+  top:50%;
+  transform:translateY(-50%);
+  width:44px;
+  height:44px;
+  border-radius:50%;
+  border:none;
+  background:rgba(255,255,255,0.14);
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  z-index:2;
+}
+.lb-nav[hidden]{display:none;}
+.lb-prev{left:12px;}
+.lb-next{right:12px;}
+.lb-count{
+  position:absolute;
+  bottom:calc(18px + env(safe-area-inset-bottom));
+  left:50%;
+  transform:translateX(-50%);
+  color:#fff;
+  font-size:13px;
+  font-weight:500;
+  background:rgba(0,0,0,0.45);
+  padding:4px 12px;
+  border-radius:999px;
+}
+.lb-count[hidden]{display:none;}
 </style>
 </head>
 <body>
@@ -608,16 +807,28 @@ input[type=file]{
 
   <div class="search-row">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
-    <input type="text" id="searchInput" placeholder="Suchen — z. B. Ausweis, Schlafzimmer, Geschenke …">
+    <input type="text" id="searchInput" placeholder="Suchen — z. B. Ausweis, Schlafzimmer, Geschenke …" autocomplete="off" autocapitalize="off">
+    <button class="search-clear" id="searchClear" aria-label="Suche leeren" hidden>
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
   </div>
 
-  <div class="filter-row">
-    <button class="filter-tab active" data-filter="open">Offen</button>
-    <button class="filter-tab" data-filter="done">Erledigt</button>
-    <button class="filter-tab" data-filter="all">Alle</button>
+  <div class="filter-row" role="tablist" aria-label="Status-Filter">
+    <button class="filter-tab active" role="tab" aria-selected="true" data-filter="open">Offen</button>
+    <button class="filter-tab" role="tab" aria-selected="false" data-filter="done">Erledigt</button>
+    <button class="filter-tab" role="tab" aria-selected="false" data-filter="all">Alle</button>
   </div>
 
-  <p class="count-line" id="countLine"></p>
+  <div class="chip-row" id="categoryRow" aria-label="Kategorie-Filter" hidden></div>
+
+  <div class="toolbar" id="toolbar" hidden>
+    <p class="count-line" id="countLine"></p>
+    <select id="sortSelect" aria-label="Sortierung">
+      <option value="created">Neueste zuerst</option>
+      <option value="updated">Zuletzt geändert</option>
+      <option value="az">Name A–Z</option>
+    </select>
+  </div>
 
   <div id="content">
     <div class="loading-row">lädt …</div>
@@ -629,44 +840,40 @@ input[type=file]{
 </button>
 
 <div class="overlay" id="overlay">
-  <div class="sheet">
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
     <div class="sheet-handle"></div>
     <h2 id="sheetTitle">Neuer Eintrag</h2>
 
     <div class="field">
-      <label>Foto (optional)</label>
-      <div class="photo-zone">
-        <div class="photo-preview-wrap empty" id="photoPreviewWrap">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="7" width="18" height="13" rx="3"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><circle cx="12" cy="13.5" r="3"/></svg>
-        </div>
-        <div class="photo-actions">
-          <label class="photo-btn" for="photoInputCamera">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="7" width="18" height="13" rx="3"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><circle cx="12" cy="13.5" r="3"/></svg>
-            Kamera
-          </label>
-          <label class="photo-btn" for="photoInputGallery">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="m3 16 5-5 4 4 5-6 4 5"/></svg>
-            Galerie
-          </label>
-        </div>
-        <input type="file" id="photoInputCamera" accept="image/*" capture="environment">
-        <input type="file" id="photoInputGallery" accept="image/*">
+      <label id="photoLabel">Fotos (optional)</label>
+      <div class="photo-strip" id="photoStrip" hidden></div>
+      <div class="photo-add-row">
+        <label class="photo-btn" for="photoInputCamera">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="7" width="18" height="13" rx="3"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><circle cx="12" cy="13.5" r="3"/></svg>
+          Kamera
+        </label>
+        <label class="photo-btn" for="photoInputGallery">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="m3 16 5-5 4 4 5-6 4 5"/></svg>
+          Galerie
+        </label>
       </div>
+      <input type="file" id="photoInputCamera" accept="image/*" capture="environment">
+      <input type="file" id="photoInputGallery" accept="image/*" multiple>
     </div>
 
     <div class="field">
-      <label>Was ist es?</label>
-      <input type="text" id="labelInput" placeholder="z. B. Ausweis, Geburtstagsgeschenk für Mia">
+      <label for="labelInput">Was ist es?</label>
+      <input type="text" id="labelInput" placeholder="z. B. Ausweis, Geburtstagsgeschenk für Mia" autocapitalize="sentences" enterkeyhint="next">
     </div>
 
     <div class="field">
-      <label>Wo hast du es hingetan?</label>
-      <textarea id="locationInput" rows="2" placeholder="z. B. Schlafzimmer, linker Schrank, obere Ecke"></textarea>
+      <label for="locationInput">Wo hast du es hingetan?</label>
+      <textarea id="locationInput" rows="2" placeholder="z. B. Schlafzimmer, linker Schrank, obere Ecke" autocapitalize="sentences"></textarea>
     </div>
 
     <div class="field">
-      <label>Kategorie (optional)</label>
-      <input type="text" id="categoryInput" list="categoryList" placeholder="z. B. Geschenke, Dokumente, Schlüssel">
+      <label for="categoryInput">Kategorie (optional)</label>
+      <input type="text" id="categoryInput" list="categoryList" placeholder="z. B. Geschenke, Dokumente, Schlüssel" autocapitalize="sentences">
       <datalist id="categoryList">
         <option value="Geschenke">
         <option value="Dokumente">
@@ -680,38 +887,50 @@ input[type=file]{
       <button class="btn btn-secondary" id="cancelBtn">Abbrechen</button>
       <button class="btn btn-primary" id="saveBtn">Speichern</button>
     </div>
-    <div class="btn-row" id="deleteRow" style="display:none;">
+    <div class="btn-row" id="editActions" style="display:none;">
+      <button class="btn btn-ghost" id="shareBtn">Teilen</button>
       <button class="btn btn-danger" id="deleteBtn">Eintrag löschen</button>
     </div>
   </div>
 </div>
 
-<div class="lightbox" id="lightbox">
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Foto-Ansicht">
   <button class="lightbox-close" id="lightboxClose" aria-label="Foto schließen">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
   </button>
+  <button class="lb-nav lb-prev" id="lbPrev" aria-label="Vorheriges Foto" hidden>
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+  </button>
   <img id="lightboxImg" src="" alt="">
+  <button class="lb-nav lb-next" id="lbNext" aria-label="Nächstes Foto" hidden>
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+  </button>
+  <span class="lb-count" id="lbCount" hidden></span>
+</div>
+
+<div class="update-bar" id="updateBar" hidden>
+  <span>Neue Version verfügbar.</span>
+  <button id="updateReload">Neu laden</button>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
+'use strict';
+
 const STORAGE_KEY = 'stash-items';
+const DB_NAME = 'woistwas';
+const DB_VERSION = 1;
+const MAX_PHOTOS = 8;
+
 let items = [];
 let editingId = null;
-let pendingPhoto = null;
-
-// Speichert grundsätzlich lokal auf diesem Gerät/Browser (localStorage) —
-// kein Cloud-Abgleich, keine Abhängigkeit von der Claude-Umgebung.
-async function storageGet(key){
-  const raw = localStorage.getItem(key);
-  return raw !== null ? {value: raw} : null;
-}
-
-async function storageSet(key, value){
-  localStorage.setItem(key, value);
-  return {value};
-}
+let pendingPhotos = [];
+let activeFilter = 'open';
+let activeCategory = 'all';
+let sortMode = localStorage.getItem('stash-sort') || 'created';
+let backend = 'local';
+let lastFocused = null;
 
 const el = id => document.getElementById(id);
 const contentEl = el('content');
@@ -719,83 +938,302 @@ const searchInput = el('searchInput');
 const overlay = el('overlay');
 const toast = el('toast');
 const countLine = el('countLine');
-let activeFilter = 'open';
 
-// --- Foto-Vollbild (Lightbox) ---
-const lightbox = el('lightbox');
-const lightboxImg = el('lightboxImg');
-
-function openLightbox(src){
-  if(!src) return;
-  lightboxImg.src = src;
-  lightbox.classList.add('open');
+/* ------------------------------------------------------------------ */
+/*  Speicher: IndexedDB (mit localStorage als Fallback + Migration)    */
+/* ------------------------------------------------------------------ */
+let _db = null;
+function openDB(){
+  return new Promise((resolve, reject)=>{
+    if(_db) return resolve(_db);
+    let req;
+    try{ req = indexedDB.open(DB_NAME, DB_VERSION); }
+    catch(e){ return reject(e); }
+    req.onupgradeneeded = ()=>{
+      const db = req.result;
+      if(!db.objectStoreNames.contains('items')) db.createObjectStore('items', {keyPath:'id'});
+    };
+    req.onsuccess = ()=>{ _db = req.result; resolve(_db); };
+    req.onerror = ()=> reject(req.error);
+    req.onblocked = ()=> reject(new Error('blocked'));
+  });
 }
-function closeLightbox(){
-  lightbox.classList.remove('open');
-  lightboxImg.src = '';
+function idbAllItems(){
+  return openDB().then(db => new Promise((res, rej)=>{
+    const tx = db.transaction('items', 'readonly');
+    const rq = tx.objectStore('items').getAll();
+    rq.onsuccess = ()=> res(rq.result || []);
+    rq.onerror = ()=> rej(rq.error);
+  }));
 }
-el('lightboxClose').addEventListener('click', closeLightbox);
-lightbox.addEventListener('click', (e)=>{ if(e.target === lightbox) closeLightbox(); });
-document.addEventListener('keydown', (e)=>{
-  if(e.key === 'Escape' && lightbox.classList.contains('open')) closeLightbox();
-});
+function idbPutAll(list){
+  return openDB().then(db => new Promise((res, rej)=>{
+    const tx = db.transaction('items', 'readwrite');
+    tx.oncomplete = ()=> res(true);
+    tx.onerror = ()=> rej(tx.error);
+    tx.onabort = ()=> rej(tx.error || new Error('abort'));
+    const store = tx.objectStore('items');
+    list.forEach(it => store.put(it));
+  }));
+}
+function idbDelete(id){
+  return openDB().then(db => new Promise((res, rej)=>{
+    const tx = db.transaction('items', 'readwrite');
+    tx.oncomplete = ()=> res(true);
+    tx.onerror = ()=> rej(tx.error);
+    tx.objectStore('items').delete(id);
+  }));
+}
 
+async function loadPersisted(){
+  if(backend === 'idb') return await idbAllItems();
+  const raw = localStorage.getItem(STORAGE_KEY);
+  return raw ? JSON.parse(raw) : [];
+}
+async function persistItems(){
+  if(backend === 'idb'){
+    await idbPutAll(items);
+  }else{
+    try{
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+    }catch(e){
+      showToast('Speicher voll — bitte alte Einträge löschen oder ein Backup anlegen.');
+      throw e;
+    }
+  }
+}
+async function removePersisted(id){
+  if(backend === 'idb') await idbDelete(id);
+  else await persistItems();
+}
+
+async function requestPersistentStorage(){
+  try{
+    if(navigator.storage && navigator.storage.persist){
+      const already = await navigator.storage.persisted();
+      if(!already) await navigator.storage.persist();
+    }
+  }catch(e){ /* egal */ }
+}
+
+/* ------------------------------------------------------------------ */
+/*  Hilfsfunktionen                                                    */
+/* ------------------------------------------------------------------ */
 function showToast(msg){
   toast.textContent = msg;
   toast.classList.add('show');
-  setTimeout(()=>toast.classList.remove('show'), 2400);
+  setTimeout(()=> toast.classList.remove('show'), 2600);
 }
 
 function escapeHtml(s){
   const d = document.createElement('div');
-  d.textContent = s;
+  d.textContent = s == null ? '' : String(s);
   return d.innerHTML;
 }
 
+function norm(s){
+  return (s == null ? '' : String(s)).toLowerCase()
+    .replace(/ä/g,'ae').replace(/ö/g,'oe').replace(/ü/g,'ue').replace(/ß/g,'ss')
+    .normalize('NFD').replace(/[̀-ͯ]/g,'');
+}
+
 function formatDate(iso){
-  try{
-    const d = new Date(iso);
-    return d.toLocaleDateString('de-DE', {day:'2-digit', month:'2-digit', year:'numeric'});
-  }catch(e){ return ''; }
+  const d = new Date(iso);
+  if(isNaN(d.getTime())) return '';
+  return d.toLocaleDateString('de-DE', {day:'2-digit', month:'2-digit', year:'numeric'});
 }
 
-async function loadItems(){
-  try{
-    const result = await storageGet(STORAGE_KEY);
-    items = result && result.value ? JSON.parse(result.value) : [];
-  }catch(e){
-    items = [];
-  }
-  render();
+function newId(){
+  return 'it_' + Date.now() + '_' + Math.random().toString(36).slice(2,7);
 }
 
-async function saveItems(){
-  try{
-    const ok = await storageSet(STORAGE_KEY, JSON.stringify(items));
-    if(!ok) throw new Error('no result');
-  }catch(e){
-    showToast('Speichern fehlgeschlagen — bitte nochmal versuchen.');
-    throw e;
+// Fremde / alte Datensätze in ein sauberes, sicheres Format bringen.
+function normalizeItem(raw){
+  if(!raw || typeof raw !== 'object') return null;
+  const label = String(raw.label || '').trim();
+  const location = String(raw.location || '').trim();
+  if(!label && !location) return null;
+  let photos = [];
+  if(Array.isArray(raw.photos)){
+    photos = raw.photos.filter(p => typeof p === 'string' && p.startsWith('data:image/'));
+  }else if(typeof raw.photo === 'string' && raw.photo.startsWith('data:image/')){
+    photos = [raw.photo];
   }
+  const createdAt = typeof raw.createdAt === 'string' ? raw.createdAt : new Date().toISOString();
+  const updatedAt = typeof raw.updatedAt === 'string' ? raw.updatedAt : createdAt;
+  return {
+    id: (typeof raw.id === 'string' && raw.id) ? raw.id : newId(),
+    label, location,
+    category: String(raw.category || '').trim(),
+    photos,
+    done: !!raw.done,
+    createdAt, updatedAt
+  };
+}
+
+function lockScroll(){
+  const anyOpen = overlay.classList.contains('open') || lightbox.classList.contains('open');
+  document.body.classList.toggle('no-scroll', anyOpen);
+}
+
+/* ------------------------------------------------------------------ */
+/*  Foto-Vollbild (Lightbox) mit mehreren Bildern + Zoom               */
+/* ------------------------------------------------------------------ */
+const lightbox = el('lightbox');
+const lightboxImg = el('lightboxImg');
+let lbList = [];
+let lbIndex = 0;
+let lbZoom = 1, lbPanX = 0, lbPanY = 0;
+
+function applyLbTransform(){
+  lightboxImg.style.transform = `translate(${lbPanX}px, ${lbPanY}px) scale(${lbZoom})`;
+}
+function resetLbZoom(){
+  lbZoom = 1; lbPanX = 0; lbPanY = 0;
+  lightboxImg.classList.remove('zoomed');
+  applyLbTransform();
+}
+function showLbImage(){
+  lightboxImg.src = lbList[lbIndex] || '';
+  const multi = lbList.length > 1;
+  el('lbPrev').hidden = !multi || lbIndex === 0;
+  el('lbNext').hidden = !multi || lbIndex === lbList.length - 1;
+  const c = el('lbCount');
+  c.hidden = !multi;
+  if(multi) c.textContent = (lbIndex + 1) + ' / ' + lbList.length;
+}
+function openLightbox(list, index){
+  lbList = Array.isArray(list) ? list.slice() : [list];
+  lbIndex = Math.max(0, Math.min(index || 0, lbList.length - 1));
+  resetLbZoom();
+  showLbImage();
+  lightbox.classList.add('open');
+  lockScroll();
+}
+function closeLightbox(){
+  lightbox.classList.remove('open');
+  lightboxImg.src = '';
+  resetLbZoom();
+  lockScroll();
+}
+function lbGo(d){
+  const n = lbIndex + d;
+  if(n < 0 || n >= lbList.length) return;
+  lbIndex = n;
+  resetLbZoom();
+  showLbImage();
+}
+el('lightboxClose').addEventListener('click', closeLightbox);
+el('lbPrev').addEventListener('click', (e)=>{ e.stopPropagation(); lbGo(-1); });
+el('lbNext').addEventListener('click', (e)=>{ e.stopPropagation(); lbGo(1); });
+lightbox.addEventListener('click', (e)=>{ if(e.target === lightbox) closeLightbox(); });
+lightboxImg.addEventListener('dblclick', ()=>{
+  if(lbZoom === 1){ lbZoom = 2.4; lightboxImg.classList.add('zoomed'); }
+  else resetLbZoom();
+  applyLbTransform();
+});
+
+// Touch: Pinch-Zoom, Ziehen im Zoom, Wischen zum Blättern, Doppeltipp-Zoom
+let tStartDist = 0, tStartZoom = 1;
+let tStartX = 0, tStartY = 0, tPanStartX = 0, tPanStartY = 0, tPanning = false;
+let tSwipeStartX = 0, tLastTap = 0;
+function touchDist(t){
+  const dx = t[0].clientX - t[1].clientX;
+  const dy = t[0].clientY - t[1].clientY;
+  return Math.hypot(dx, dy);
+}
+lightboxImg.addEventListener('touchstart', (e)=>{
+  if(e.touches.length === 2){
+    tStartDist = touchDist(e.touches);
+    tStartZoom = lbZoom;
+    tPanning = false;
+  }else if(e.touches.length === 1){
+    const now = Date.now();
+    if(now - tLastTap < 300){
+      if(lbZoom === 1){ lbZoom = 2.4; lightboxImg.classList.add('zoomed'); }
+      else resetLbZoom();
+      applyLbTransform();
+    }
+    tLastTap = now;
+    tPanning = lbZoom > 1;
+    tStartX = e.touches[0].clientX;
+    tStartY = e.touches[0].clientY;
+    tPanStartX = lbPanX;
+    tPanStartY = lbPanY;
+    tSwipeStartX = e.touches[0].clientX;
+  }
+}, {passive:true});
+lightboxImg.addEventListener('touchmove', (e)=>{
+  if(e.touches.length === 2 && tStartDist){
+    lbZoom = Math.min(4, Math.max(1, tStartZoom * (touchDist(e.touches) / tStartDist)));
+    lightboxImg.classList.toggle('zoomed', lbZoom > 1);
+    applyLbTransform();
+  }else if(e.touches.length === 1 && tPanning){
+    lbPanX = tPanStartX + (e.touches[0].clientX - tStartX);
+    lbPanY = tPanStartY + (e.touches[0].clientY - tStartY);
+    applyLbTransform();
+  }
+}, {passive:true});
+lightboxImg.addEventListener('touchend', (e)=>{
+  if(lbZoom < 1.05 && lbZoom !== 1) resetLbZoom();
+  if(lbZoom === 1 && e.changedTouches.length){
+    const dx = e.changedTouches[0].clientX - tSwipeStartX;
+    if(Math.abs(dx) > 60) dx < 0 ? lbGo(1) : lbGo(-1);
+  }
+  tStartDist = 0;
+});
+
+/* ------------------------------------------------------------------ */
+/*  Liste rendern                                                      */
+/* ------------------------------------------------------------------ */
+function renderCategoryChips(){
+  const row = el('categoryRow');
+  const cats = [...new Set(items.map(i => i.category).filter(Boolean))]
+    .sort((a,b)=> a.localeCompare(b, 'de'));
+  if(activeCategory !== 'all' && !cats.includes(activeCategory)) activeCategory = 'all';
+  if(cats.length === 0){ row.hidden = true; row.innerHTML = ''; return; }
+  row.hidden = false;
+  row.innerHTML = ['all'].concat(cats).map(c => {
+    const active = activeCategory === c ? ' active' : '';
+    const txt = c === 'all' ? 'Alle' : escapeHtml(c);
+    return `<button class="chip${active}" data-cat="${escapeHtml(c)}">${txt}</button>`;
+  }).join('');
+  row.querySelectorAll('.chip').forEach(ch => ch.addEventListener('click', ()=>{
+    activeCategory = ch.dataset.cat;
+    renderCategoryChips();
+    render();
+  }));
+}
+
+function sortItems(list){
+  const a = list.slice();
+  if(sortMode === 'az'){
+    a.sort((x,y)=> norm(x.label).localeCompare(norm(y.label)));
+  }else if(sortMode === 'updated'){
+    a.sort((x,y)=> (y.updatedAt || y.createdAt || '').localeCompare(x.updatedAt || x.createdAt || ''));
+  }else{
+    a.sort((x,y)=> (y.createdAt || '').localeCompare(x.createdAt || ''));
+  }
+  return a;
 }
 
 function render(){
-  const q = searchInput.value.trim().toLowerCase();
+  const q = searchInput.value.trim();
+  const nq = norm(q);
 
-  let base = items;
-  if(activeFilter === 'open') base = items.filter(it => !it.done);
-  else if(activeFilter === 'done') base = items.filter(it => it.done);
+  let base = items.slice();
+  if(activeFilter === 'open') base = base.filter(it => !it.done);
+  else if(activeFilter === 'done') base = base.filter(it => it.done);
+  if(activeCategory !== 'all') base = base.filter(it => it.category === activeCategory);
 
-  const filtered = q
-    ? base.filter(it =>
-        (it.label||'').toLowerCase().includes(q) ||
-        (it.location||'').toLowerCase().includes(q) ||
-        (it.category||'').toLowerCase().includes(q))
+  const filtered = nq
+    ? base.filter(it => norm(it.label).includes(nq) || norm(it.location).includes(nq) || norm(it.category).includes(nq))
     : base;
 
-  const sorted = [...filtered].sort((a,b)=> (b.createdAt||'').localeCompare(a.createdAt||''));
+  const sorted = sortItems(filtered);
 
-  const openCount = items.filter(it=>!it.done).length;
+  const openCount = items.filter(it => !it.done).length;
+  el('toolbar').hidden = items.length === 0;
   countLine.textContent = items.length === 0
     ? ''
     : `${openCount} offen · ${items.length - openCount} erledigt`;
@@ -820,27 +1258,29 @@ function render(){
 
   contentEl.innerHTML = `<div class="grid">${sorted.map(cardHtml).join('')}</div>`;
 
-  sorted.forEach(it=>{
-    const cardNode = document.getElementById('card-'+it.id);
-    if(cardNode) cardNode.addEventListener('click', ()=>openEdit(it.id));
-    const checkNode = document.getElementById('check-'+it.id);
+  sorted.forEach(it => {
+    const cardNode = document.getElementById('card-' + it.id);
+    if(cardNode) cardNode.addEventListener('click', ()=> openEdit(it.id));
+    const checkNode = document.getElementById('check-' + it.id);
     if(checkNode) checkNode.addEventListener('click', (e)=>{
       e.stopPropagation();
       toggleDone(it.id);
     });
-    if(it.photo && cardNode){
+    if(it.photos.length && cardNode){
       const thumbNode = cardNode.querySelector('.thumb');
       if(thumbNode) thumbNode.addEventListener('click', (e)=>{
         e.stopPropagation();
-        openLightbox(it.photo);
+        openLightbox(it.photos, 0);
       });
     }
   });
 }
 
 function cardHtml(it){
-  const thumb = it.photo
-    ? `<img class="thumb" src="${it.photo}" alt="">`
+  const first = it.photos[0];
+  const badge = it.photos.length > 1 ? `<span class="thumb-badge">+${it.photos.length - 1}</span>` : '';
+  const thumb = first
+    ? `<div class="thumb-wrap"><img class="thumb" src="${escapeHtml(first)}" alt="">${badge}</div>`
     : `<div class="thumb placeholder"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="7" width="18" height="13" rx="3"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></div>`;
 
   return `
@@ -864,27 +1304,30 @@ function cardHtml(it){
 }
 
 async function toggleDone(id){
-  const idx = items.findIndex(i=>i.id===id);
-  if(idx===-1) return;
+  const idx = items.findIndex(i => i.id === id);
+  if(idx === -1) return;
   items[idx].done = !items[idx].done;
+  items[idx].updatedAt = new Date().toISOString();
   try{
-    await saveItems();
+    await persistItems();
     render();
     showToast(items[idx].done ? 'Als erledigt markiert.' : 'Wieder als offen markiert.');
   }catch(e){}
 }
 
-// --- Photo handling ---
+/* ------------------------------------------------------------------ */
+/*  Foto-Verarbeitung                                                  */
+/* ------------------------------------------------------------------ */
 function resizeAndEncode(file){
   return new Promise((resolve, reject)=>{
     const reader = new FileReader();
     reader.onload = e => {
       const img = new Image();
       img.onload = () => {
-        const maxDim = 800;
+        const maxDim = 1000;
         let w = img.width, h = img.height;
-        if(w > h && w > maxDim){ h = h*(maxDim/w); w = maxDim; }
-        else if(h > maxDim){ w = w*(maxDim/h); h = maxDim; }
+        if(w > h && w > maxDim){ h = h * (maxDim / w); w = maxDim; }
+        else if(h > maxDim){ w = w * (maxDim / h); h = maxDim; }
         const canvas = document.createElement('canvas');
         canvas.width = w; canvas.height = h;
         canvas.getContext('2d').drawImage(img, 0, 0, w, h);
@@ -898,66 +1341,99 @@ function resizeAndEncode(file){
   });
 }
 
-function setPhotoPreview(dataUrl){
-  const wrap = el('photoPreviewWrap');
-  if(dataUrl){
-    wrap.classList.remove('empty');
-    wrap.innerHTML = `<img src="${dataUrl}" alt="">`;
-  }else{
-    wrap.classList.add('empty');
-    wrap.innerHTML = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="7" width="18" height="13" rx="3"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><circle cx="12" cy="13.5" r="3"/></svg>`;
-  }
+function renderPhotoStrip(){
+  const strip = el('photoStrip');
+  strip.hidden = pendingPhotos.length === 0;
+  strip.innerHTML = pendingPhotos.map((src, i) => `
+    <div class="pstrip-item">
+      <img src="${escapeHtml(src)}" alt="Foto ${i + 1}" data-i="${i}">
+      <button type="button" class="pstrip-remove" data-i="${i}" aria-label="Foto entfernen">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>`).join('');
+  strip.querySelectorAll('img').forEach(img =>
+    img.addEventListener('click', ()=> openLightbox(pendingPhotos, +img.dataset.i)));
+  strip.querySelectorAll('.pstrip-remove').forEach(b =>
+    b.addEventListener('click', ()=>{
+      pendingPhotos.splice(+b.dataset.i, 1);
+      renderPhotoStrip();
+    }));
 }
 
 async function handleFileSelect(e){
-  const file = e.target.files[0];
-  if(!file) return;
-  try{
-    pendingPhoto = await resizeAndEncode(file);
-    setPhotoPreview(pendingPhoto);
-  }catch(err){
-    showToast('Foto konnte nicht geladen werden.');
+  const files = Array.from(e.target.files || []);
+  let hitLimit = false;
+  for(const file of files){
+    if(pendingPhotos.length >= MAX_PHOTOS){ hitLimit = true; break; }
+    try{
+      pendingPhotos.push(await resizeAndEncode(file));
+    }catch(err){
+      showToast('Ein Foto konnte nicht geladen werden.');
+    }
   }
+  if(hitLimit) showToast(`Maximal ${MAX_PHOTOS} Fotos pro Eintrag.`);
+  renderPhotoStrip();
   e.target.value = '';
 }
 
 el('photoInputCamera').addEventListener('change', handleFileSelect);
 el('photoInputGallery').addEventListener('change', handleFileSelect);
 
-el('photoPreviewWrap').addEventListener('click', ()=>{
-  if(pendingPhoto) openLightbox(pendingPhoto);
-});
+/* ------------------------------------------------------------------ */
+/*  Bearbeiten-Dialog                                                  */
+/* ------------------------------------------------------------------ */
+let deleteArmed = false, deleteTimer = null;
 
-// --- Modal open/close ---
+function disarmDelete(){
+  deleteArmed = false;
+  clearTimeout(deleteTimer);
+  const b = el('deleteBtn');
+  b.textContent = 'Eintrag löschen';
+  b.classList.remove('armed');
+}
+
+function openSheet(){
+  lastFocused = document.activeElement;
+  overlay.classList.add('open');
+  lockScroll();
+}
+
 function openNew(){
   editingId = null;
-  pendingPhoto = null;
+  pendingPhotos = [];
+  disarmDelete();
   el('sheetTitle').textContent = 'Neuer Eintrag';
   el('labelInput').value = '';
   el('locationInput').value = '';
   el('categoryInput').value = '';
-  setPhotoPreview(null);
-  el('deleteRow').style.display = 'none';
-  overlay.classList.add('open');
-  setTimeout(()=>el('labelInput').focus(), 220);
+  renderPhotoStrip();
+  el('editActions').style.display = 'none';
+  openSheet();
+  setTimeout(()=> el('labelInput').focus(), 220);
 }
 
 function openEdit(id){
-  const it = items.find(i=>i.id===id);
+  const it = items.find(i => i.id === id);
   if(!it) return;
   editingId = id;
-  pendingPhoto = it.photo || null;
+  pendingPhotos = it.photos.slice();
+  disarmDelete();
   el('sheetTitle').textContent = 'Eintrag bearbeiten';
   el('labelInput').value = it.label;
   el('locationInput').value = it.location;
   el('categoryInput').value = it.category || '';
-  setPhotoPreview(it.photo || null);
-  el('deleteRow').style.display = 'flex';
-  overlay.classList.add('open');
+  renderPhotoStrip();
+  el('editActions').style.display = 'flex';
+  openSheet();
 }
 
 function closeSheet(){
   overlay.classList.remove('open');
+  disarmDelete();
+  lockScroll();
+  if(lastFocused && typeof lastFocused.focus === 'function'){
+    lastFocused.focus();
+  }
 }
 
 el('addBtn').addEventListener('click', openNew);
@@ -977,28 +1453,32 @@ el('saveBtn').addEventListener('click', async ()=>{
   el('saveBtn').disabled = true;
   el('saveBtn').textContent = 'Speichert …';
 
+  const now = new Date().toISOString();
   if(editingId){
-    const idx = items.findIndex(i=>i.id===editingId);
-    if(idx>-1){
-      items[idx] = {...items[idx], label, location, category, photo: pendingPhoto};
+    const idx = items.findIndex(i => i.id === editingId);
+    if(idx > -1){
+      items[idx] = {...items[idx], label, location, category, photos: pendingPhotos.slice(), updatedAt: now};
     }
   }else{
     items.push({
-      id: 'it_' + Date.now() + '_' + Math.random().toString(36).slice(2,7),
+      id: newId(),
       label, location, category,
-      photo: pendingPhoto,
+      photos: pendingPhotos.slice(),
       done: false,
-      createdAt: new Date().toISOString()
+      createdAt: now,
+      updatedAt: now
     });
   }
 
   try{
-    await saveItems();
+    await persistItems();
     closeSheet();
+    renderCategoryChips();
     render();
+    maybeShowBackupReminder();
     showToast('Gespeichert.');
   }catch(e){
-    // toast already shown by saveItems
+    // Toast kommt aus persistItems
   }finally{
     el('saveBtn').disabled = false;
     el('saveBtn').textContent = 'Speichern';
@@ -1007,34 +1487,116 @@ el('saveBtn').addEventListener('click', async ()=>{
 
 el('deleteBtn').addEventListener('click', async ()=>{
   if(!editingId) return;
-  items = items.filter(i=>i.id!==editingId);
+  if(!deleteArmed){
+    deleteArmed = true;
+    const b = el('deleteBtn');
+    b.textContent = 'Wirklich löschen?';
+    b.classList.add('armed');
+    deleteTimer = setTimeout(disarmDelete, 3500);
+    return;
+  }
+  const id = editingId;
+  items = items.filter(i => i.id !== id);
   try{
-    await saveItems();
+    await removePersisted(id);
     closeSheet();
+    renderCategoryChips();
     render();
+    maybeShowBackupReminder();
     showToast('Eintrag gelöscht.');
   }catch(e){}
 });
 
-searchInput.addEventListener('input', render);
+/* --- Einzelnen Eintrag teilen --- */
+function dataUrlToFile(dataUrl, name){
+  const parts = dataUrl.split(',');
+  const mime = (parts[0].match(/:(.*?);/) || [])[1] || 'image/jpeg';
+  const bin = atob(parts[1]);
+  const arr = new Uint8Array(bin.length);
+  for(let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+  return new File([arr], name, {type: mime});
+}
 
-document.querySelectorAll('.filter-tab').forEach(tab=>{
+el('shareBtn').addEventListener('click', async ()=>{
+  const it = items.find(i => i.id === editingId);
+  if(!it) return;
+  const text = `Wo ist Was — ${it.label}\nOrt: ${it.location}` + (it.category ? `\nKategorie: ${it.category}` : '');
+  try{
+    if(navigator.share){
+      const data = {title: it.label, text};
+      if(it.photos[0] && navigator.canShare){
+        try{
+          const file = dataUrlToFile(it.photos[0], 'foto.jpg');
+          if(navigator.canShare({files: [file]})) data.files = [file];
+        }catch(e){}
+      }
+      await navigator.share(data);
+    }else if(navigator.clipboard){
+      await navigator.clipboard.writeText(text);
+      showToast('In die Zwischenablage kopiert.');
+    }else{
+      showToast('Teilen wird hier nicht unterstützt.');
+    }
+  }catch(e){ /* Nutzer hat abgebrochen */ }
+});
+
+/* ------------------------------------------------------------------ */
+/*  Suche, Filter, Sortierung                                          */
+/* ------------------------------------------------------------------ */
+searchInput.addEventListener('input', ()=>{
+  el('searchClear').hidden = !searchInput.value;
+  render();
+});
+el('searchClear').addEventListener('click', ()=>{
+  searchInput.value = '';
+  el('searchClear').hidden = true;
+  render();
+  searchInput.focus();
+});
+
+document.querySelectorAll('.filter-tab').forEach(tab => {
   tab.addEventListener('click', ()=>{
-    document.querySelectorAll('.filter-tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.filter-tab').forEach(t => {
+      t.classList.remove('active');
+      t.setAttribute('aria-selected', 'false');
+    });
     tab.classList.add('active');
+    tab.setAttribute('aria-selected', 'true');
     activeFilter = tab.dataset.filter;
     render();
   });
 });
 
-// --- Sichern / Wiederherstellen (überlebt "Browserdaten löschen") ---
-function updateBackupHint(){
-  const raw = localStorage.getItem('stash-last-backup');
+el('sortSelect').addEventListener('change', (e)=>{
+  sortMode = e.target.value;
+  localStorage.setItem('stash-sort', sortMode);
+  render();
+});
+
+/* ------------------------------------------------------------------ */
+/*  Sichern / Wiederherstellen                                         */
+/* ------------------------------------------------------------------ */
+function maybeShowBackupReminder(){
   const hint = el('backupHint');
   if(!hint) return;
-  hint.textContent = raw
-    ? 'Letzte Sicherung: ' + new Date(raw).toLocaleString('de-DE', {day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit'})
-    : 'Noch keine Sicherung erstellt.';
+  if(items.length === 0){ hint.textContent = ''; return; }
+
+  const last = localStorage.getItem('stash-last-backup');
+  const lastCount = +(localStorage.getItem('stash-last-backup-count') || 0);
+  const grew = items.length - lastCount;
+  const daysSince = last ? Math.floor((Date.now() - new Date(last).getTime()) / 86400000) : Infinity;
+
+  if(!last){
+    hint.innerHTML = '<span class="reminder">Noch keine Sicherung.</span> „Sichern“ lädt eine Datei herunter, die auch „Browserdaten löschen“ übersteht.';
+  }else if(daysSince >= 21 || grew >= 8){
+    const parts = [];
+    if(isFinite(daysSince)) parts.push(`letzte Sicherung vor ${daysSince} Tagen`);
+    if(grew > 0) parts.push(`${grew} neue Einträge seither`);
+    hint.innerHTML = `<span class="reminder">Zeit für ein frisches Backup</span> — ${parts.join(', ')}.`;
+  }else{
+    hint.textContent = 'Letzte Sicherung: ' + new Date(last).toLocaleString('de-DE',
+      {day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit'});
+  }
 }
 
 el('backupBtn').addEventListener('click', ()=>{
@@ -1045,7 +1607,7 @@ el('backupBtn').addEventListener('click', ()=>{
   const blob = new Blob([JSON.stringify(items, null, 2)], {type:'application/json'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  const stamp = new Date().toISOString().slice(0,10);
+  const stamp = new Date().toISOString().slice(0, 10);
   a.href = url;
   a.download = `wo-ist-was-backup-${stamp}.json`;
   document.body.appendChild(a);
@@ -1053,7 +1615,8 @@ el('backupBtn').addEventListener('click', ()=>{
   a.remove();
   URL.revokeObjectURL(url);
   localStorage.setItem('stash-last-backup', new Date().toISOString());
-  updateBackupHint();
+  localStorage.setItem('stash-last-backup-count', String(items.length));
+  maybeShowBackupReminder();
   showToast('Sicherungsdatei heruntergeladen.');
 });
 
@@ -1066,18 +1629,20 @@ el('restoreInput').addEventListener('change', (e)=>{
       const parsed = JSON.parse(ev.target.result);
       if(!Array.isArray(parsed)) throw new Error('kein gültiges Sicherungsformat');
 
-      const existingIds = new Set(items.map(i=>i.id));
-      let added = 0, updated = 0;
-      parsed.forEach(incoming=>{
-        if(!incoming || !incoming.id) return;
-        const idx = items.findIndex(i=>i.id===incoming.id);
-        if(idx>-1){ items[idx] = incoming; updated++; }
-        else { items.push(incoming); added++; }
+      let added = 0, updated = 0, skipped = 0;
+      parsed.forEach(raw => {
+        const it = normalizeItem(raw);
+        if(!it){ skipped++; return; }
+        const idx = items.findIndex(i => i.id === it.id);
+        if(idx > -1){ items[idx] = it; updated++; }
+        else{ items.push(it); added++; }
       });
 
-      await saveItems();
+      await persistItems();
+      renderCategoryChips();
       render();
-      showToast(`Wiederhergestellt: ${added} neu, ${updated} aktualisiert.`);
+      maybeShowBackupReminder();
+      showToast(`Wiederhergestellt: ${added} neu, ${updated} aktualisiert` + (skipped ? `, ${skipped} übersprungen` : '') + '.');
     }catch(err){
       showToast('Diese Datei sieht nicht wie eine gültige Sicherung aus.');
     }
@@ -1086,12 +1651,34 @@ el('restoreInput').addEventListener('change', (e)=>{
   e.target.value = '';
 });
 
-updateBackupHint();
+/* ------------------------------------------------------------------ */
+/*  Tastatur: Escape schließt, Fokus bleibt im Dialog                  */
+/* ------------------------------------------------------------------ */
+function trapFocus(e){
+  if(e.key !== 'Tab' || !overlay.classList.contains('open')) return;
+  const sheet = overlay.querySelector('.sheet');
+  const focusables = Array.from(sheet.querySelectorAll(
+    'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+  )).filter(x => !x.disabled && x.offsetParent !== null);
+  if(!focusables.length) return;
+  const first = focusables[0];
+  const last = focusables[focusables.length - 1];
+  if(e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
+  else if(!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
+}
 
-// Installations-Hinweis nur zeigen, wenn nicht bereits im Vollbild-/Standalone-Modus
-// und nicht schon zuvor weggeklickt.
-// Installations-Hinweis nur zeigen, wenn nicht bereits im Vollbild-/Standalone-Modus
-// und nicht schon zuvor weggeklickt.
+document.addEventListener('keydown', (e)=>{
+  if(e.key === 'Escape'){
+    if(lightbox.classList.contains('open')) closeLightbox();
+    else if(overlay.classList.contains('open')) closeSheet();
+    return;
+  }
+  trapFocus(e);
+});
+
+/* ------------------------------------------------------------------ */
+/*  Installations-Hinweis                                              */
+/* ------------------------------------------------------------------ */
 (function initInstallHint(){
   const hint = el('installHint');
   const hintText = el('installHintText');
@@ -1105,7 +1692,6 @@ updateBackupHint();
     return;
   }
 
-  // Android/Chrome: eigenes Installations-Angebot statt manueller Anleitung
   let deferredPrompt = null;
   window.addEventListener('beforeinstallprompt', (e)=>{
     e.preventDefault();
@@ -1129,15 +1715,91 @@ updateBackupHint();
   });
 })();
 
-// Service Worker nur registrieren, wenn über echten Server (http/https) geladen —
-// über eine lokale file:// -Datei wird das vom Browser ohnehin verweigert.
+/* ------------------------------------------------------------------ */
+/*  Service Worker + Update-Hinweis                                    */
+/* ------------------------------------------------------------------ */
+el('updateReload').addEventListener('click', ()=> location.reload());
+
 if('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')){
   window.addEventListener('load', ()=>{
-    navigator.serviceWorker.register('sw.js').catch(()=>{ /* stiller Fehlschlag, App funktioniert trotzdem */ });
+    navigator.serviceWorker.register('sw.js').then((reg)=>{
+      if(reg.waiting && navigator.serviceWorker.controller){
+        el('updateBar').hidden = false;
+      }
+      reg.addEventListener('updatefound', ()=>{
+        const nw = reg.installing;
+        if(!nw) return;
+        nw.addEventListener('statechange', ()=>{
+          if(nw.state === 'installed' && navigator.serviceWorker.controller){
+            el('updateBar').hidden = false;
+          }
+        });
+      });
+    }).catch(()=>{ /* App läuft auch ohne SW */ });
   });
 }
 
-loadItems();
+/* ------------------------------------------------------------------ */
+/*  Start                                                              */
+/* ------------------------------------------------------------------ */
+async function loadItems(){
+  try{
+    const raw = await loadPersisted();
+    items = (Array.isArray(raw) ? raw : []).map(normalizeItem).filter(Boolean);
+  }catch(e){
+    items = [];
+  }
+  el('sortSelect').value = sortMode;
+  renderCategoryChips();
+  render();
+  maybeShowBackupReminder();
+}
+
+async function init(){
+  // 1. IndexedDB versuchen
+  try{
+    await openDB();
+    backend = 'idb';
+  }catch(e){
+    backend = 'local';
+  }
+
+  // 2. Einmalige Migration von localStorage → IndexedDB
+  if(backend === 'idb'){
+    try{
+      const existing = await idbAllItems();
+      if(existing.length === 0){
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if(raw){
+          const old = JSON.parse(raw);
+          if(Array.isArray(old) && old.length){
+            const normalized = old.map(normalizeItem).filter(Boolean);
+            if(normalized.length){
+              await idbPutAll(normalized);
+              // localStorage-Kopie bleibt als zusätzliches Sicherheitsnetz erhalten
+              localStorage.setItem('stash-migrated-idb', new Date().toISOString());
+            }
+          }
+        }
+      }
+    }catch(e){ /* Migration best effort */ }
+  }
+
+  // 3. Dauerhaften Speicher anfragen (weniger Gefahr, dass der Browser aufräumt)
+  await requestPersistentStorage();
+
+  // 4. Speichermodus im Datenschutz-Chip anzeigen
+  const modeLabel = el('storageModeLabel');
+  if(modeLabel){
+    modeLabel.textContent = backend === 'idb'
+      ? 'Privat — nur lokal auf diesem Gerät gespeichert'
+      : 'Privat — lokal auf diesem Gerät (einfacher Speicher)';
+  }
+
+  await loadItems();
+}
+
+init();
 </script>
 
 </body>
