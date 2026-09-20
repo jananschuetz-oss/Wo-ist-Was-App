@@ -126,6 +126,7 @@ body.no-scroll{overflow:hidden;}
   padding:0;
   font-family:'Inter', sans-serif;
 }
+.backup-link.armed{color:var(--danger);}
 .backup-hint{
   font-size:11.5px;
   color:var(--ink-faint);
@@ -855,6 +856,7 @@ input[type=file]{
         <span id="householdNameLabel"></span>
       </span>
       <button class="backup-link" id="showInviteBtn">Einladungscode</button>
+      <button class="backup-link" id="leaveHouseholdBtn">Haushalt verlassen</button>
       <button class="backup-link" id="authLogoutInlineBtn">Abmelden</button>
     </div>
 
@@ -1109,6 +1111,24 @@ function idbPutAll(list){
     const store = tx.objectStore('items');
     list.forEach(it => store.put(it));
   }));
+}
+function idbClearAll(){
+  return openDB().then(db => new Promise((res, rej)=>{
+    const tx = db.transaction('items', 'readwrite');
+    tx.oncomplete = ()=> res(true);
+    tx.onerror = ()=> rej(tx.error);
+    tx.objectStore('items').clear();
+  }));
+}
+// Lokale Einträge komplett leeren (Konto-/Haushaltswechsel auf diesem Gerät) —
+// idbPutAll([]) würde nichts tun, weil es nur upsertet statt zu leeren.
+async function clearLocalItems(){
+  items = [];
+  if(backend === 'idb'){
+    try{ await idbClearAll(); }catch(e){}
+  }else{
+    localStorage.removeItem(STORAGE_KEY);
+  }
 }
 async function loadPersisted(){
   if(backend === 'idb') return await idbAllItems();
@@ -2090,10 +2110,11 @@ el('joinHouseholdBtn').addEventListener('click', async ()=>{
   }
 });
 
-function doLogout(){
+async function doLogout(){
   pb.authStore.clear();
   currentHousehold = null;
   localStorage.removeItem('stash-household');
+  await clearLocalItems();
   el('householdForm').hidden = true;
   el('authForm').hidden = false;
   el('authEmail').value = '';
@@ -2109,6 +2130,45 @@ el('showInviteBtn').addEventListener('click', async ()=>{
   if(!currentHousehold) return;
   try{ await navigator.clipboard.writeText(currentHousehold.invite_code); }catch(e){}
   showToast(`Einladungscode kopiert: ${currentHousehold.invite_code}`);
+});
+
+let leaveArmed = false, leaveTimer = null;
+function disarmLeave(){
+  leaveArmed = false;
+  clearTimeout(leaveTimer);
+  const b = el('leaveHouseholdBtn');
+  b.textContent = 'Haushalt verlassen';
+  b.classList.remove('armed');
+}
+
+el('leaveHouseholdBtn').addEventListener('click', async ()=>{
+  if(!currentHousehold) return;
+  if(!leaveArmed){
+    leaveArmed = true;
+    const b = el('leaveHouseholdBtn');
+    b.textContent = 'Wirklich verlassen?';
+    b.classList.add('armed');
+    leaveTimer = setTimeout(disarmLeave, 3500);
+    return;
+  }
+  disarmLeave();
+  el('leaveHouseholdBtn').disabled = true;
+  try{
+    await pbCustomPost('/api/wiw/leave', {household: currentHousehold.id});
+    const name = currentHousehold.name;
+    currentHousehold = null;
+    localStorage.removeItem('stash-household');
+    await clearLocalItems();
+    updateHouseholdUi();
+    render();
+    maybeShowBackupReminder();
+    showToast(`„${name}" verlassen.`);
+    showAuthGate('household');
+  }catch(e){
+    showToast(friendlyAuthError(e));
+  }finally{
+    el('leaveHouseholdBtn').disabled = false;
+  }
 });
 
 // Nach Login/Registrierung: passenden Haushalt finden oder Auswahl anzeigen.
