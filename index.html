@@ -768,6 +768,74 @@ input[type=file]{
   border-radius:999px;
 }
 .lb-count[hidden]{display:none;}
+
+/* Anmelden / Haushalt */
+.auth-gate{
+  position:fixed;
+  inset:0;
+  z-index:200;
+  background:var(--bg);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+  overflow-y:auto;
+}
+.auth-gate[hidden]{display:none;}
+.auth-card{width:100%; max-width:400px;}
+.auth-title{
+  font-family:'Manrope', sans-serif;
+  font-weight:800;
+  font-size:26px;
+  margin:0 0 8px;
+  text-align:center;
+}
+.auth-sub{
+  font-size:14px;
+  color:var(--ink-soft);
+  text-align:center;
+  margin:0 0 24px;
+  line-height:1.5;
+}
+.auth-switch{text-align:center; font-size:13px; color:var(--ink-soft); margin-top:16px;}
+.auth-switch button{
+  background:none; border:none; color:var(--primary-dark);
+  font-weight:700; cursor:pointer; font-size:13px; padding:0 0 0 4px;
+  font-family:'Inter', sans-serif;
+}
+.auth-error{color:var(--danger); font-size:13px; margin-top:14px; text-align:center; line-height:1.5;}
+.auth-error[hidden]{display:none;}
+.auth-divider{
+  text-align:center; color:var(--ink-faint); font-size:12px;
+  margin:22px 0; position:relative;
+}
+.auth-divider::before, .auth-divider::after{
+  content:''; position:absolute; top:50%; width:38%; height:1px; background:var(--line);
+}
+.auth-divider::before{left:0;}
+.auth-divider::after{right:0;}
+.auth-logout{
+  display:block; margin:26px auto 0; background:none; border:none;
+  color:var(--ink-faint); font-size:12.5px; cursor:pointer; text-decoration:underline;
+  font-family:'Inter', sans-serif;
+}
+
+.household-row{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  flex-wrap:wrap;
+  margin-top:10px;
+}
+.household-row[hidden]{display:none;}
+.household-chip{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  font-size:12.5px;
+  font-weight:600;
+  color:var(--ink-soft);
+}
 </style>
 </head>
 <body>
@@ -780,6 +848,15 @@ input[type=file]{
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2 4 5v6c0 5.5 3.4 9.7 8 11 4.6-1.3 8-5.5 8-11V5l-8-3z"/></svg>
       <span id="storageModeLabel">Privat — nur lokal auf diesem Gerät gespeichert</span>
     </span>
+
+    <div class="household-row" id="householdRow" hidden>
+      <span class="household-chip">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V9.5"/></svg>
+        <span id="householdNameLabel"></span>
+      </span>
+      <button class="backup-link" id="showInviteBtn">Einladungscode</button>
+      <button class="backup-link" id="authLogoutInlineBtn">Abmelden</button>
+    </div>
 
     <div class="backup-row">
       <button class="backup-link" id="backupBtn">
@@ -915,6 +992,54 @@ input[type=file]{
 
 <div class="toast" id="toast"></div>
 
+<div class="auth-gate" id="authGate" hidden>
+  <div class="auth-card">
+    <h1 class="auth-title">Wo ist Was App.</h1>
+    <p class="auth-sub" id="authSub">Melde dich an, um deine Einträge mit deinem Haushalt zu teilen.</p>
+
+    <div id="authForm">
+      <div class="field">
+        <label for="authEmail">E-Mail</label>
+        <input type="email" id="authEmail" autocomplete="email" placeholder="du@beispiel.de">
+      </div>
+      <div class="field">
+        <label for="authPassword">Passwort</label>
+        <input type="password" id="authPassword" autocomplete="current-password" placeholder="Mindestens 8 Zeichen">
+      </div>
+      <div class="field" id="authPasswordConfirmField" hidden>
+        <label for="authPasswordConfirm">Passwort bestätigen</label>
+        <input type="password" id="authPasswordConfirm" autocomplete="new-password">
+      </div>
+      <button class="btn btn-primary" id="authSubmitBtn" style="width:100%;">Anmelden</button>
+      <p class="auth-switch">
+        <span id="authSwitchText">Noch keinen Account?</span><button type="button" id="authSwitchBtn">Registrieren</button>
+      </p>
+      <p class="auth-error" id="authError" hidden></p>
+    </div>
+
+    <div id="householdForm" hidden>
+      <p class="auth-sub">Fast geschafft — leg einen Haushalt an oder tritt einem bei.</p>
+      <div class="field">
+        <label for="householdNameInput">Neuen Haushalt erstellen</label>
+        <input type="text" id="householdNameInput" placeholder="z. B. Familie Anschütz">
+      </div>
+      <button class="btn btn-primary" id="createHouseholdBtn" style="width:100%;">Haushalt erstellen</button>
+
+      <div class="auth-divider">oder</div>
+
+      <div class="field">
+        <label for="joinCodeInput">Einladungscode</label>
+        <input type="text" id="joinCodeInput" placeholder="z. B. AB3K9Q2M" style="text-transform:uppercase;">
+      </div>
+      <button class="btn btn-secondary" id="joinHouseholdBtn" style="width:100%;">Haushalt beitreten</button>
+      <p class="auth-error" id="householdError" hidden></p>
+
+      <button type="button" class="auth-logout" id="authLogoutBtn">Abmelden</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/pocketbase@0.28.1/dist/pocketbase.umd.js"></script>
 <script>
 'use strict';
 
@@ -931,6 +1056,15 @@ let activeCategory = 'all';
 let sortMode = localStorage.getItem('stash-sort') || 'created';
 let backend = 'local';
 let lastFocused = null;
+
+/* ------------------------------------------------------------------ */
+/*  Sync: PocketBase-Backend (Haushalt teilen)                         */
+/* ------------------------------------------------------------------ */
+const PB_URL = 'https://wo-ist-was-backend-production.up.railway.app';
+const pb = new PocketBase(PB_URL);
+let currentHousehold = null; // {id, name, invite_code, owner}
+let authMode = 'login'; // 'login' | 'register'
+let fileToken = null, fileTokenAt = 0;
 
 const el = id => document.getElementById(id);
 const contentEl = el('content');
@@ -976,15 +1110,6 @@ function idbPutAll(list){
     list.forEach(it => store.put(it));
   }));
 }
-function idbDelete(id){
-  return openDB().then(db => new Promise((res, rej)=>{
-    const tx = db.transaction('items', 'readwrite');
-    tx.oncomplete = ()=> res(true);
-    tx.onerror = ()=> rej(tx.error);
-    tx.objectStore('items').delete(id);
-  }));
-}
-
 async function loadPersisted(){
   if(backend === 'idb') return await idbAllItems();
   const raw = localStorage.getItem(STORAGE_KEY);
@@ -1002,11 +1127,6 @@ async function persistItems(){
     }
   }
 }
-async function removePersisted(id){
-  if(backend === 'idb') await idbDelete(id);
-  else await persistItems();
-}
-
 async function requestPersistentStorage(){
   try{
     if(navigator.storage && navigator.storage.persist){
@@ -1061,14 +1181,26 @@ function normalizeItem(raw){
   }
   const createdAt = typeof raw.createdAt === 'string' ? raw.createdAt : new Date().toISOString();
   const updatedAt = typeof raw.updatedAt === 'string' ? raw.updatedAt : createdAt;
+  const remoteId = typeof raw.remoteId === 'string' && raw.remoteId ? raw.remoteId : null;
   return {
     id: (typeof raw.id === 'string' && raw.id) ? raw.id : newId(),
+    remoteId,
     label, location,
+    room: String(raw.room || '').trim(),
     category: String(raw.category || '').trim(),
     photos,
+    remotePhotoNames: Array.isArray(raw.remotePhotoNames) ? raw.remotePhotoNames.filter(p => typeof p === 'string') : [],
+    photosDirty: !!raw.photosDirty,
+    // "dirty" = hat lokale Änderungen, die noch nicht auf dem Server sind
+    dirty: raw.dirty != null ? !!raw.dirty : !remoteId,
     done: !!raw.done,
+    deleted: !!raw.deleted,
     createdAt, updatedAt
   };
+}
+
+function visibleItems(){
+  return items.filter(it => !it.deleted);
 }
 
 function lockScroll(){
@@ -1188,7 +1320,7 @@ lightboxImg.addEventListener('touchend', (e)=>{
 /* ------------------------------------------------------------------ */
 function renderCategoryChips(){
   const row = el('categoryRow');
-  const cats = [...new Set(items.map(i => i.category).filter(Boolean))]
+  const cats = [...new Set(visibleItems().map(i => i.category).filter(Boolean))]
     .sort((a,b)=> a.localeCompare(b, 'de'));
   if(activeCategory !== 'all' && !cats.includes(activeCategory)) activeCategory = 'all';
   if(cats.length === 0){ row.hidden = true; row.innerHTML = ''; return; }
@@ -1220,8 +1352,9 @@ function sortItems(list){
 function render(){
   const q = searchInput.value.trim();
   const nq = norm(q);
+  const all = visibleItems();
 
-  let base = items.slice();
+  let base = all.slice();
   if(activeFilter === 'open') base = base.filter(it => !it.done);
   else if(activeFilter === 'done') base = base.filter(it => it.done);
   if(activeCategory !== 'all') base = base.filter(it => it.category === activeCategory);
@@ -1232,13 +1365,13 @@ function render(){
 
   const sorted = sortItems(filtered);
 
-  const openCount = items.filter(it => !it.done).length;
-  el('toolbar').hidden = items.length === 0;
-  countLine.textContent = items.length === 0
+  const openCount = all.filter(it => !it.done).length;
+  el('toolbar').hidden = all.length === 0;
+  countLine.textContent = all.length === 0
     ? ''
-    : `${openCount} offen · ${items.length - openCount} erledigt`;
+    : `${openCount} offen · ${all.length - openCount} erledigt`;
 
-  if(items.length === 0){
+  if(all.length === 0){
     contentEl.innerHTML = `
       <div class="empty">
         <div class="icon-wrap">
@@ -1308,10 +1441,12 @@ async function toggleDone(id){
   if(idx === -1) return;
   items[idx].done = !items[idx].done;
   items[idx].updatedAt = new Date().toISOString();
+  items[idx].dirty = true;
   try{
     await persistItems();
     render();
     showToast(items[idx].done ? 'Als erledigt markiert.' : 'Wieder als offen markiert.');
+    syncPushItem(items[idx].id);
   }catch(e){}
 }
 
@@ -1454,17 +1589,31 @@ el('saveBtn').addEventListener('click', async ()=>{
   el('saveBtn').textContent = 'Speichert …';
 
   const now = new Date().toISOString();
+  let savedId;
   if(editingId){
     const idx = items.findIndex(i => i.id === editingId);
     if(idx > -1){
-      items[idx] = {...items[idx], label, location, category, photos: pendingPhotos.slice(), updatedAt: now};
+      const prev = items[idx].photos;
+      const photosChanged = prev.length !== pendingPhotos.length || prev.some((p, i) => p !== pendingPhotos[i]);
+      items[idx] = {
+        ...items[idx], label, location, category,
+        photos: pendingPhotos.slice(), updatedAt: now, dirty: true,
+        photosDirty: items[idx].photosDirty || photosChanged
+      };
+      savedId = items[idx].id;
     }
   }else{
+    savedId = newId();
     items.push({
-      id: newId(),
-      label, location, category,
+      id: savedId,
+      remoteId: null,
+      label, location, category, room: '',
       photos: pendingPhotos.slice(),
+      remotePhotoNames: [],
+      photosDirty: pendingPhotos.length > 0,
+      dirty: true,
       done: false,
+      deleted: false,
       createdAt: now,
       updatedAt: now
     });
@@ -1477,6 +1626,7 @@ el('saveBtn').addEventListener('click', async ()=>{
     render();
     maybeShowBackupReminder();
     showToast('Gespeichert.');
+    syncPushItem(savedId);
   }catch(e){
     // Toast kommt aus persistItems
   }finally{
@@ -1496,14 +1646,20 @@ el('deleteBtn').addEventListener('click', async ()=>{
     return;
   }
   const id = editingId;
-  items = items.filter(i => i.id !== id);
+  const idx = items.findIndex(i => i.id === id);
+  if(idx > -1){
+    items[idx].deleted = true;
+    items[idx].dirty = true;
+    items[idx].updatedAt = new Date().toISOString();
+  }
   try{
-    await removePersisted(id);
+    await persistItems();
     closeSheet();
     renderCategoryChips();
     render();
     maybeShowBackupReminder();
     showToast('Eintrag gelöscht.');
+    syncPushItem(id);
   }catch(e){}
 });
 
@@ -1579,11 +1735,12 @@ el('sortSelect').addEventListener('change', (e)=>{
 function maybeShowBackupReminder(){
   const hint = el('backupHint');
   if(!hint) return;
-  if(items.length === 0){ hint.textContent = ''; return; }
+  const count = visibleItems().length;
+  if(count === 0){ hint.textContent = ''; return; }
 
   const last = localStorage.getItem('stash-last-backup');
   const lastCount = +(localStorage.getItem('stash-last-backup-count') || 0);
-  const grew = items.length - lastCount;
+  const grew = count - lastCount;
   const daysSince = last ? Math.floor((Date.now() - new Date(last).getTime()) / 86400000) : Infinity;
 
   if(!last){
@@ -1600,11 +1757,12 @@ function maybeShowBackupReminder(){
 }
 
 el('backupBtn').addEventListener('click', ()=>{
-  if(items.length === 0){
+  const toBackup = visibleItems();
+  if(toBackup.length === 0){
     showToast('Es gibt noch nichts zu sichern.');
     return;
   }
-  const blob = new Blob([JSON.stringify(items, null, 2)], {type:'application/json'});
+  const blob = new Blob([JSON.stringify(toBackup, null, 2)], {type:'application/json'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   const stamp = new Date().toISOString().slice(0, 10);
@@ -1615,7 +1773,7 @@ el('backupBtn').addEventListener('click', ()=>{
   a.remove();
   URL.revokeObjectURL(url);
   localStorage.setItem('stash-last-backup', new Date().toISOString());
-  localStorage.setItem('stash-last-backup-count', String(items.length));
+  localStorage.setItem('stash-last-backup-count', String(toBackup.length));
   maybeShowBackupReminder();
   showToast('Sicherungsdatei heruntergeladen.');
 });
@@ -1633,6 +1791,12 @@ el('restoreInput').addEventListener('change', (e)=>{
       parsed.forEach(raw => {
         const it = normalizeItem(raw);
         if(!it){ skipped++; return; }
+        // Wiederhergestellte Einträge immer als neu behandeln und hochsynchronisieren —
+        // eine alte remoteId könnte zu einem anderen Haushalt gehören.
+        it.remoteId = null;
+        it.remotePhotoNames = [];
+        it.photosDirty = it.photos.length > 0;
+        it.dirty = true;
         const idx = items.findIndex(i => i.id === it.id);
         if(idx > -1){ items[idx] = it; updated++; }
         else{ items.push(it); added++; }
@@ -1643,6 +1807,7 @@ el('restoreInput').addEventListener('change', (e)=>{
       render();
       maybeShowBackupReminder();
       showToast(`Wiederhergestellt: ${added} neu, ${updated} aktualisiert` + (skipped ? `, ${skipped} übersprungen` : '') + '.');
+      syncAll();
     }catch(err){
       showToast('Diese Datei sieht nicht wie eine gültige Sicherung aus.');
     }
@@ -1650,6 +1815,339 @@ el('restoreInput').addEventListener('change', (e)=>{
   reader.readAsText(file);
   e.target.value = '';
 });
+
+/* ------------------------------------------------------------------ */
+/*  Sync mit dem Haushalt (PocketBase)                                 */
+/* ------------------------------------------------------------------ */
+function arraysEqual(a, b){
+  return a.length === b.length && a.every((v, i) => v === b[i]);
+}
+
+async function getFileToken(){
+  if(fileToken && Date.now() - fileTokenAt < 5 * 60 * 1000) return fileToken;
+  fileToken = await pb.files.getToken();
+  fileTokenAt = Date.now();
+  return fileToken;
+}
+
+function downloadAsDataUrl(url){
+  return fetch(url)
+    .then(res => res.blob())
+    .then(blob => new Promise((resolve, reject) => {
+      const r = new FileReader();
+      r.onload = () => resolve(r.result);
+      r.onerror = reject;
+      r.readAsDataURL(blob);
+    }));
+}
+
+async function pbCustomPost(path, body){
+  const res = await fetch(PB_URL + path, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json', 'Authorization': pb.authStore.token},
+    body: JSON.stringify(body)
+  });
+  const data = await res.json().catch(() => ({}));
+  if(!res.ok) throw Object.assign(new Error(data.message || 'Anfrage fehlgeschlagen.'), {data});
+  return data;
+}
+
+// Lokalen Eintrag auf dem Server anlegen/aktualisieren (Fotos nur neu hochladen, wenn geändert)
+async function pushItem(item){
+  if(!currentHousehold) return item;
+  const fd = new FormData();
+  fd.append('household', currentHousehold.id);
+  fd.append('label', item.label);
+  fd.append('location', item.location);
+  fd.append('room', item.room || '');
+  fd.append('category', item.category || '');
+  fd.append('done', item.done ? 'true' : 'false');
+  fd.append('deleted', item.deleted ? 'true' : 'false');
+
+  if(item.photosDirty){
+    (item.remotePhotoNames || []).forEach(name => fd.append('photos-', name));
+    item.photos.forEach((src, i) => fd.append('photos', dataUrlToFile(src, `foto-${i}.jpg`)));
+  }
+
+  const record = item.remoteId
+    ? await pb.collection('items').update(item.remoteId, fd)
+    : await pb.collection('items').create(fd);
+
+  return {
+    ...item,
+    remoteId: record.id,
+    remotePhotoNames: record.photos || [],
+    photosDirty: false,
+    dirty: false,
+    updatedAt: record.updated || item.updatedAt
+  };
+}
+
+// Server-Datensatz in ein lokales Item übersetzen; unveränderte Fotos werden nicht neu geladen.
+async function remoteToLocal(rec, existingLocal){
+  const photoNames = rec.photos || [];
+  let photos;
+  if(existingLocal && arraysEqual(existingLocal.remotePhotoNames || [], photoNames)){
+    photos = existingLocal.photos;
+  }else if(photoNames.length){
+    const token = await getFileToken();
+    photos = await Promise.all(photoNames.map(name => downloadAsDataUrl(pb.files.getURL(rec, name, {token}))));
+  }else{
+    photos = [];
+  }
+  return {
+    id: existingLocal ? existingLocal.id : newId(),
+    remoteId: rec.id,
+    label: rec.label,
+    location: rec.location,
+    room: rec.room || '',
+    category: rec.category || '',
+    photos,
+    remotePhotoNames: photoNames,
+    photosDirty: false,
+    dirty: false,
+    done: !!rec.done,
+    deleted: !!rec.deleted,
+    createdAt: rec.created,
+    updatedAt: rec.updated
+  };
+}
+
+// Einen einzelnen Eintrag im Hintergrund hochladen (nach Speichern/Erledigt/Löschen).
+async function syncPushItem(id){
+  if(!currentHousehold || !pb.authStore.isValid) return;
+  const idx = items.findIndex(i => i.id === id);
+  if(idx === -1) return;
+  try{
+    items[idx] = await pushItem(items[idx]);
+    await persistItems();
+    render();
+  }catch(e){
+    // Offline oder Serverfehler: bleibt lokal markiert und wird beim nächsten Sync erneut versucht.
+    console.warn('Sync fehlgeschlagen, wird später erneut versucht.', e);
+  }
+}
+
+// Server-Stand abholen und mit dem lokalen Stand zusammenführen (lokale, noch ungesicherte
+// Änderungen — "dirty" — haben immer Vorrang und werden nicht überschrieben).
+async function pullAndMerge(){
+  if(!currentHousehold) return;
+  let remoteItems;
+  try{
+    remoteItems = await pb.collection('items').getFullList({filter: `household = "${currentHousehold.id}"`});
+  }catch(e){ return; }
+
+  for(const rec of remoteItems){
+    const idx = items.findIndex(i => i.remoteId === rec.id);
+    if(idx === -1){
+      items.push(await remoteToLocal(rec));
+      continue;
+    }
+    const local = items[idx];
+    if(local.dirty) continue;
+    if(new Date(local.updatedAt).getTime() === new Date(rec.updated).getTime()) continue;
+    items[idx] = await remoteToLocal(rec, local);
+  }
+  await persistItems();
+}
+
+// Alles Ungesicherte hochladen, dann den Serverstand abholen.
+async function syncAll(){
+  if(!currentHousehold || !pb.authStore.isValid) return;
+  const toPush = items.filter(it => it.dirty);
+  for(const it of toPush){
+    try{
+      const idx = items.findIndex(i => i.id === it.id);
+      if(idx > -1) items[idx] = await pushItem(items[idx]);
+    }catch(e){
+      console.warn('Konnte Eintrag nicht hochladen, versuche es später erneut.', e);
+    }
+  }
+  await persistItems();
+  await pullAndMerge();
+}
+
+/* ------------------------------------------------------------------ */
+/*  Anmeldung, Registrierung, Haushalt                                 */
+/* ------------------------------------------------------------------ */
+function showAuthGate(step){
+  el('authGate').hidden = false;
+  document.body.classList.add('no-scroll');
+  el('authForm').hidden = step !== 'login';
+  el('householdForm').hidden = step !== 'household';
+}
+function hideAuthGate(){
+  el('authGate').hidden = true;
+  document.body.classList.remove('no-scroll');
+}
+
+function updateHouseholdUi(){
+  const row = el('householdRow');
+  if(!currentHousehold){ row.hidden = true; return; }
+  row.hidden = false;
+  el('householdNameLabel').textContent = currentHousehold.name;
+  el('storageModeLabel').textContent = 'Geteilt mit deinem Haushalt — Server in der EU';
+}
+
+function friendlyAuthError(err){
+  const status = err && err.status;
+  if(status === 400) return 'E-Mail oder Passwort ist falsch, oder die Adresse ist schon registriert.';
+  if(status === 0 || /fehlgeschlagen|failed to fetch/i.test((err && err.message) || '')) return 'Keine Verbindung zum Server — bist du online?';
+  return (err && err.message) || 'Etwas ist schiefgelaufen. Bitte nochmal versuchen.';
+}
+
+el('authSwitchBtn').addEventListener('click', ()=>{
+  authMode = authMode === 'login' ? 'register' : 'login';
+  el('authSubmitBtn').textContent = authMode === 'login' ? 'Anmelden' : 'Registrieren';
+  el('authSwitchText').textContent = authMode === 'login' ? 'Noch keinen Account?' : 'Schon registriert?';
+  el('authSwitchBtn').textContent = authMode === 'login' ? 'Registrieren' : 'Anmelden';
+  el('authPasswordConfirmField').hidden = authMode === 'login';
+  el('authError').hidden = true;
+});
+
+el('authSubmitBtn').addEventListener('click', async ()=>{
+  const email = el('authEmail').value.trim();
+  const password = el('authPassword').value;
+  const errorEl = el('authError');
+  errorEl.hidden = true;
+
+  if(!email || !password){
+    errorEl.textContent = 'Bitte E-Mail und Passwort ausfüllen.';
+    errorEl.hidden = false;
+    return;
+  }
+
+  el('authSubmitBtn').disabled = true;
+  try{
+    if(authMode === 'register'){
+      const confirmPw = el('authPasswordConfirm').value;
+      if(password.length < 8) throw new Error('Das Passwort muss mindestens 8 Zeichen haben.');
+      if(password !== confirmPw) throw new Error('Die Passwörter stimmen nicht überein.');
+      await pb.collection('users').create({email, password, passwordConfirm: confirmPw});
+      await pb.collection('users').authWithPassword(email, password);
+    }else{
+      await pb.collection('users').authWithPassword(email, password);
+    }
+    await afterLogin();
+  }catch(err){
+    errorEl.textContent = friendlyAuthError(err);
+    errorEl.hidden = false;
+  }finally{
+    el('authSubmitBtn').disabled = false;
+  }
+});
+
+el('createHouseholdBtn').addEventListener('click', async ()=>{
+  const name = el('householdNameInput').value.trim();
+  const err = el('householdError');
+  err.hidden = true;
+  if(!name){ err.textContent = 'Bitte einen Namen für den Haushalt eingeben.'; err.hidden = false; return; }
+
+  el('createHouseholdBtn').disabled = true;
+  try{
+    const rec = await pb.collection('households').create({name});
+    currentHousehold = {id: rec.id, name: rec.name, invite_code: rec.invite_code, owner: rec.owner};
+    localStorage.setItem('stash-household', JSON.stringify(currentHousehold));
+    hideAuthGate();
+    updateHouseholdUi();
+    await loadItems();
+    await syncAll();
+    render();
+    maybeShowBackupReminder();
+    showToast(`Haushalt „${rec.name}" erstellt.`);
+  }catch(e){
+    err.textContent = friendlyAuthError(e);
+    err.hidden = false;
+  }finally{
+    el('createHouseholdBtn').disabled = false;
+  }
+});
+
+el('joinHouseholdBtn').addEventListener('click', async ()=>{
+  const code = el('joinCodeInput').value.trim().toUpperCase();
+  const err = el('householdError');
+  err.hidden = true;
+  if(!code){ err.textContent = 'Bitte einen Einladungscode eingeben.'; err.hidden = false; return; }
+
+  el('joinHouseholdBtn').disabled = true;
+  try{
+    const res = await pbCustomPost('/api/wiw/join', {code});
+    const rec = await pb.collection('households').getOne(res.id);
+    currentHousehold = {id: rec.id, name: rec.name, invite_code: rec.invite_code, owner: rec.owner};
+    localStorage.setItem('stash-household', JSON.stringify(currentHousehold));
+    hideAuthGate();
+    updateHouseholdUi();
+    await loadItems();
+    await syncAll();
+    render();
+    maybeShowBackupReminder();
+    showToast(`Haushalt „${rec.name}" beigetreten.`);
+  }catch(e){
+    err.textContent = friendlyAuthError(e);
+    err.hidden = false;
+  }finally{
+    el('joinHouseholdBtn').disabled = false;
+  }
+});
+
+function doLogout(){
+  pb.authStore.clear();
+  currentHousehold = null;
+  localStorage.removeItem('stash-household');
+  el('householdForm').hidden = true;
+  el('authForm').hidden = false;
+  el('authEmail').value = '';
+  el('authPassword').value = '';
+  authMode = 'login';
+  el('authSubmitBtn').textContent = 'Anmelden';
+  showAuthGate('login');
+}
+el('authLogoutBtn').addEventListener('click', doLogout);
+el('authLogoutInlineBtn').addEventListener('click', doLogout);
+
+el('showInviteBtn').addEventListener('click', async ()=>{
+  if(!currentHousehold) return;
+  try{ await navigator.clipboard.writeText(currentHousehold.invite_code); }catch(e){}
+  showToast(`Einladungscode kopiert: ${currentHousehold.invite_code}`);
+});
+
+// Nach Login/Registrierung: passenden Haushalt finden oder Auswahl anzeigen.
+async function resolveHousehold(){
+  const cachedRaw = localStorage.getItem('stash-household');
+  if(cachedRaw){
+    try{ currentHousehold = JSON.parse(cachedRaw); }catch(e){}
+  }
+  try{
+    const list = await pb.collection('households').getFullList();
+    if(list.length){
+      const h = list[0];
+      currentHousehold = {id: h.id, name: h.name, invite_code: h.invite_code, owner: h.owner};
+      localStorage.setItem('stash-household', JSON.stringify(currentHousehold));
+      updateHouseholdUi();
+      return true;
+    }
+    currentHousehold = null;
+    localStorage.removeItem('stash-household');
+    showAuthGate('household');
+    return false;
+  }catch(e){
+    if(currentHousehold){ updateHouseholdUi(); return true; }
+    showAuthGate('household');
+    return false;
+  }
+}
+
+async function afterLogin(){
+  const ok = await resolveHousehold();
+  if(!ok) return;
+  hideAuthGate();
+  await loadItems();
+  await syncAll();
+  render();
+  maybeShowBackupReminder();
+}
+
+window.addEventListener('online', ()=>{ if(currentHousehold) syncAll().then(render); });
 
 /* ------------------------------------------------------------------ */
 /*  Tastatur: Escape schließt, Fokus bleibt im Dialog                  */
@@ -1788,15 +2286,12 @@ async function init(){
   // 3. Dauerhaften Speicher anfragen (weniger Gefahr, dass der Browser aufräumt)
   await requestPersistentStorage();
 
-  // 4. Speichermodus im Datenschutz-Chip anzeigen
-  const modeLabel = el('storageModeLabel');
-  if(modeLabel){
-    modeLabel.textContent = backend === 'idb'
-      ? 'Privat — nur lokal auf diesem Gerät gespeichert'
-      : 'Privat — lokal auf diesem Gerät (einfacher Speicher)';
+  // 4. Ohne Login geht's nicht weiter — Einträge werden mit dem Haushalt geteilt.
+  if(!pb.authStore.isValid){
+    showAuthGate('login');
+    return;
   }
-
-  await loadItems();
+  await afterLogin();
 }
 
 init();

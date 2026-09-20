@@ -3,7 +3,7 @@
 // (IndexedDB bzw. localStorage). Dieser Worker cached nur die App-Hülle
 // (HTML/CSS/JS/Icons) plus die Schriftdateien, damit die App offline startet.
 
-const CACHE_NAME = 'woistwas-cache-v3';
+const CACHE_NAME = 'woistwas-cache-v4';
 const FONT_CACHE = 'woistwas-fonts-v1';
 const APP_SHELL = [
   './',
