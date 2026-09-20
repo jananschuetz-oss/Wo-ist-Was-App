@@ -1479,14 +1479,19 @@ function resizeAndEncode(file){
     reader.onload = e => {
       const img = new Image();
       img.onload = () => {
-        const maxDim = 1000;
+        // Wie beim Aktions Tracker: verkleinern + als JPEG mit moderater
+        // Qualität speichern, hier noch etwas knapper für minimalen Platzbedarf
+        // (die App braucht nur "wiedererkennbar", keine Lesbarkeit von Kleingedrucktem).
+        const maxDim = 900;
+        const jpegQuality = 0.6;
         let w = img.width, h = img.height;
         if(w > h && w > maxDim){ h = h * (maxDim / w); w = maxDim; }
         else if(h > maxDim){ w = w * (maxDim / h); h = maxDim; }
+        w = Math.round(w); h = Math.round(h);
         const canvas = document.createElement('canvas');
         canvas.width = w; canvas.height = h;
         canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-        resolve(canvas.toDataURL('image/jpeg', 0.72));
+        resolve(canvas.toDataURL('image/jpeg', jpegQuality));
       };
       img.onerror = reject;
       img.src = e.target.result;
